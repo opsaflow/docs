@@ -72,23 +72,6 @@ The **Topology** tab shows each node in your cluster with:
 
 The easiest way to view metrics is through the Rivestack dashboard at [app.rivestack.io](https://app.rivestack.io). Charts update automatically with the selected time range.
 
-### API
-
-You can query metrics programmatically via the Rivestack API:
-
-```bash
-# Current metrics for all nodes
-GET /api/ha/:id/metrics
-
-# Historical metrics per node
-GET /api/ha/:id/nodes/metrics?range=24h
-
-# TPS sparkline data
-GET /api/ha/:id/tps
-
-# Cluster health status
-GET /api/ha/:id/health
-```
 
 ## Alerts and notifications
 

@@ -97,7 +97,6 @@ For applications that need more than 100 concurrent connections, use a client-si
 
 | Action | Limit |
 |--------|-------|
-| **API requests** | 60 requests/minute |
 | **Cluster operations** (create, scale, restore) | 1 at a time per cluster |
 | **Manual backups** | 1 at a time per cluster |
 
@@ -105,4 +104,3 @@ For applications that need more than 100 concurrent connections, use a client-si
 
 - **Storage full**: Write operations will fail. Scale to a larger server type or delete unused data.
 - **Connection limit reached**: New connections are rejected. Close idle connections or implement connection pooling.
-- **API rate limit**: Requests return HTTP 429. Retry with exponential backoff.
