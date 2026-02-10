@@ -91,6 +91,10 @@
   },
   "redirects": [
     {
+      "source": "/api-reference/introduction",
+      "destination": "/"
+    },
+    {
       "source": "/api-reference/:slug*",
       "destination": "/"
     }
