@@ -1,0 +1,106 @@
+---
+title: "Pricing"
+description: "Plans, regions, and what's included"
+---
+
+## Plans
+
+<CardGroup cols={2}>
+  <Card title="Free" icon="cube">
+    **$0/month**
+
+    For development and testing.
+
+    - Shared PostgreSQL instance
+    - 4 GB storage per database
+    - 5 concurrent connections
+    - Up to 2 databases
+    - pgvector included
+    - SSL encryption
+    - All regions
+  </Card>
+  <Card title="HA Cluster" icon="server">
+    **Starting at $29/node/month**
+
+    For production workloads.
+
+    - Dedicated infrastructure
+    - 1-3 nodes with automatic failover
+    - Up to 100 connections
+    - Automated daily backups (7-day retention)
+    - Point-in-time recovery
+    - Real-time monitoring
+    - pgvector + 25 extensions
+    - SSL encryption
+    - Firewall rules
+    - Email notifications
+    - All regions
+  </Card>
+</CardGroup>
+
+## Server types
+
+HA clusters are available in three server configurations:
+
+| | Starter | Growth | Scale |
+|-|---------|--------|-------|
+| **vCPUs** | 2 | 4 | 8 |
+| **RAM** | 4 GB | 8 GB | 16 GB |
+| **Available storage** | 55 GB | 135 GB | 295 GB |
+| **Price** | $29/node/mo | $39/node/mo | $59/node/mo |
+
+### Example pricing
+
+| Configuration | Monthly cost |
+|---------------|-------------|
+| Growth, 2 nodes | $78/mo |
+| Growth, 3 nodes | $117/mo |
+| Scale, 2 nodes | $118/mo |
+| Starter, 1 node (no HA) | $29/mo |
+
+## Regions
+
+| Region | Location | Free | HA |
+|--------|----------|------|-----|
+| EU Central | Falkenstein, Germany | Yes | Yes |
+| US East | Virginia, USA | Yes | Yes |
+| Asia | Singapore | Yes | Yes |
+
+All regions include the same features and pricing.
+
+## What's included
+
+Every HA cluster includes the following at no additional cost:
+
+| Feature | Details |
+|---------|---------|
+| **PostgreSQL 17** | Latest stable release |
+| **pgvector** | Vector similarity search for AI applications |
+| **25+ extensions** | PostGIS, TimescaleDB, pg_stat_statements, pgcrypto, pg_trgm, and more |
+| **Automated backups** | Daily, with 7-day retention |
+| **Point-in-time recovery** | Restore to any second within retention window |
+| **Monitoring** | CPU, memory, disk, TPS, connections, cache hit ratio |
+| **SSL/TLS** | Enforced on all connections |
+| **High availability** | Patroni-managed automatic failover |
+| **Load balancing** | HAProxy with read/write splitting |
+| **Firewall** | IP-based access control |
+| **Email notifications** | Provisioning, backups, health alerts |
+| **SQL Editor** | Run queries directly from the dashboard |
+
+## Billing
+
+- **Payment**: Credit card via our payment provider.
+- **Billing cycle**: Monthly, starting from cluster creation.
+- **Scaling**: Adding or removing nodes updates your subscription immediately. Changes are prorated.
+- **Cancellation**: Cancel anytime from the Billing page. Your cluster remains active until the end of the current billing period.
+
+## Free tier limits
+
+| Limit | Value |
+|-------|-------|
+| Databases per account | 2 |
+| Storage per database | 4 GB |
+| Connections per database | 5 |
+| Backups | Not included |
+| High availability | Not included |
+| Monitoring | Basic metrics only |

@@ -1,0 +1,245 @@
+---
+title: "Connection Guide"
+description: "Connect to your Rivestack PostgreSQL database from any language"
+---
+
+## Connection details
+
+Find your connection credentials in the Rivestack dashboard under the **Connection** tab of your database or cluster.
+
+| Parameter | Description | Example |
+|-----------|-------------|---------|
+| Host | Your unique endpoint | `rs-abc12345.eu-central.db.rivestack.io` |
+| Port | PostgreSQL port | `5432` |
+| Database | Database name | `mydb` |
+| Username | Database user | `myuser` |
+| Password | User password | (from dashboard) |
+| SSL Mode | Always required | `require` |
+
+## Connection string
+
+```
+postgresql://username:password@host:5432/dbname?sslmode=require
+```
+
+<Tip>Click the copy button next to each field in the dashboard to copy values to your clipboard.</Tip>
+
+## SSL / TLS
+
+All Rivestack connections **require SSL**. Unencrypted connections are rejected. Set `sslmode=require` in your connection string or driver configuration.
+
+No CA certificate download is needed — Rivestack uses certificates signed by a trusted public CA.
+
+## Connect with psql
+
+```bash
+psql "host=rs-abc12345.eu-central.db.rivestack.io port=5432 dbname=mydb user=myuser sslmode=require"
+```
+
+You'll be prompted for your password. To include it inline:
+
+```bash
+psql "postgresql://myuser:mypassword@rs-abc12345.eu-central.db.rivestack.io:5432/mydb?sslmode=require"
+```
+
+## Language examples
+
+<Tabs>
+  <Tab title="Python">
+    ### Using psycopg2
+
+    ```bash
+    pip install psycopg2-binary
+    ```
+
+    ```python
+    import psycopg2
+
+    conn = psycopg2.connect(
+        host="rs-abc12345.eu-central.db.rivestack.io",
+        port=5432,
+        dbname="mydb",
+        user="myuser",
+        password="mypassword",
+        sslmode="require"
+    )
+
+    cur = conn.cursor()
+    cur.execute("SELECT version()")
+    print(cur.fetchone())
+
+    cur.close()
+    conn.close()
+    ```
+
+    ### Using SQLAlchemy
+
+    ```bash
+    pip install sqlalchemy psycopg2-binary
+    ```
+
+    ```python
+    from sqlalchemy import create_engine
+
+    engine = create_engine(
+        "postgresql://myuser:mypassword@rs-abc12345.eu-central.db.rivestack.io:5432/mydb",
+        connect_args={"sslmode": "require"}
+    )
+
+    with engine.connect() as conn:
+        result = conn.execute("SELECT version()")
+        print(result.fetchone())
+    ```
+  </Tab>
+  <Tab title="Node.js">
+    ### Using pg (node-postgres)
+
+    ```bash
+    npm install pg
+    ```
+
+    ```javascript
+    const { Client } = require('pg');
+
+    const client = new Client({
+      host: 'rs-abc12345.eu-central.db.rivestack.io',
+      port: 5432,
+      database: 'mydb',
+      user: 'myuser',
+      password: 'mypassword',
+      ssl: { rejectUnauthorized: false }
+    });
+
+    await client.connect();
+    const res = await client.query('SELECT version()');
+    console.log(res.rows[0]);
+    await client.end();
+    ```
+
+    ### Using a connection string
+
+    ```javascript
+    const { Client } = require('pg');
+
+    const client = new Client({
+      connectionString: 'postgresql://myuser:mypassword@rs-abc12345.eu-central.db.rivestack.io:5432/mydb?sslmode=require',
+      ssl: { rejectUnauthorized: false }
+    });
+
+    await client.connect();
+    ```
+
+    ### Using Prisma
+
+    Set your `DATABASE_URL` in `.env`:
+
+    ```
+    DATABASE_URL="postgresql://myuser:mypassword@rs-abc12345.eu-central.db.rivestack.io:5432/mydb?sslmode=require"
+    ```
+  </Tab>
+  <Tab title="Go">
+    ### Using pgx
+
+    ```bash
+    go get github.com/jackc/pgx/v5
+    ```
+
+    ```go
+    package main
+
+    import (
+        "context"
+        "fmt"
+        "log"
+
+        "github.com/jackc/pgx/v5"
+    )
+
+    func main() {
+        connStr := "postgresql://myuser:mypassword@rs-abc12345.eu-central.db.rivestack.io:5432/mydb?sslmode=require"
+
+        conn, err := pgx.Connect(context.Background(), connStr)
+        if err != nil {
+            log.Fatal(err)
+        }
+        defer conn.Close(context.Background())
+
+        var version string
+        err = conn.QueryRow(context.Background(), "SELECT version()").Scan(&version)
+        if err != nil {
+            log.Fatal(err)
+        }
+
+        fmt.Println(version)
+    }
+    ```
+
+    ### Using database/sql
+
+    ```go
+    package main
+
+    import (
+        "database/sql"
+        "fmt"
+        "log"
+
+        _ "github.com/lib/pq"
+    )
+
+    func main() {
+        connStr := "host=rs-abc12345.eu-central.db.rivestack.io port=5432 user=myuser password=mypassword dbname=mydb sslmode=require"
+
+        db, err := sql.Open("postgres", connStr)
+        if err != nil {
+            log.Fatal(err)
+        }
+        defer db.Close()
+
+        var version string
+        err = db.QueryRow("SELECT version()").Scan(&version)
+        if err != nil {
+            log.Fatal(err)
+        }
+
+        fmt.Println(version)
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## HA cluster connections
+
+For HA clusters, connections are routed through a load balancer that automatically directs traffic to the primary node.
+
+| Port | Target |
+|------|--------|
+| `5432` | Primary (read-write) |
+| `5001` | Replicas (read-only) |
+| `5002` | Synchronous replicas |
+| `5003` | Asynchronous replicas |
+
+<Info>For most applications, connect to port `5432`. The load balancer handles failover automatically — your application reconnects to the new primary without changing connection details.</Info>
+
+## Connection limits
+
+| Tier | Max Connections |
+|------|----------------|
+| Free | 5 |
+| HA Cluster | 100 |
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Connection refused">
+    - Verify your host, port, and credentials are correct.
+    - Ensure you're using `sslmode=require`.
+    - Check that your IP is allowed in the cluster firewall settings.
+  </Accordion>
+  <Accordion title="SSL errors">
+    All connections require SSL. Make sure your client is configured with `sslmode=require`. You do not need to download a CA certificate.
+  </Accordion>
+  <Accordion title="Too many connections">
+    Free tier databases are limited to 5 connections. HA clusters support up to 100. Close idle connections or use connection pooling in your application.
+  </Accordion>
+</AccordionGroup>

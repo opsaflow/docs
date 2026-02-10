@@ -1,0 +1,76 @@
+---
+title: "Scaling"
+description: "Scale your PostgreSQL cluster by adding or removing nodes"
+---
+
+## Overview
+
+Rivestack HA clusters support horizontal scaling by adding or removing nodes. You can scale between 1 and 3 nodes per cluster. Scaling operations are performed through the dashboard and are handled by our automated provisioning system.
+
+## Node limits
+
+| | Minimum | Maximum | Default |
+|-|---------|---------|---------|
+| **Nodes** | 1 | 3 | 2 |
+
+<Info>We recommend running at least 2 nodes for production workloads to maintain high availability during failures.</Info>
+
+## Add a node
+
+1. Navigate to your cluster's detail page in the dashboard.
+2. Open the **Management** tab.
+3. Click **Add Node**.
+4. Review the cost impact (adds one node at your current plan's per-node price).
+5. Confirm the operation.
+
+### What happens
+
+- A new server is provisioned in the same region as your cluster.
+- PostgreSQL is installed and configured to match your cluster settings.
+- The new node joins the cluster as a **replica** and begins streaming replication from the primary.
+- Prometheus exporters are configured for monitoring.
+- The operation typically takes 3-5 minutes.
+- You can track progress in real time via the dashboard.
+
+## Remove a node
+
+1. Navigate to your cluster's detail page.
+2. Open the **Management** tab.
+3. Click **Remove Node**.
+4. Select the node to remove from the list.
+5. Type the node name to confirm.
+6. Confirm the operation.
+
+### What happens
+
+- The selected node is removed from the cluster.
+- If the removed node was a replica, no failover occurs.
+- If the removed node was the primary, Patroni automatically promotes a replica to primary before removal.
+- The server is decommissioned.
+- Your subscription is updated to reflect the new node count.
+
+<Warning>You cannot remove a node if it would bring your cluster below 1 node. You also cannot remove nodes while another scaling or configuration operation is in progress.</Warning>
+
+## Scaling constraints
+
+- **One operation at a time**: You cannot add or remove nodes while another job (backup, restore, scaling, or configuration) is in progress.
+- **Cluster must be active**: Scaling is only available for clusters in an `active` state.
+- **No vertical scaling yet**: To change server type (e.g., Starter to Growth), create a new cluster and migrate your data. Vertical scaling is on our roadmap.
+
+## Billing impact
+
+Node changes take effect immediately on your subscription:
+
+- **Adding a node** increases your monthly cost by one unit of your plan price (e.g., +$39/mo for Growth).
+- **Removing a node** decreases your monthly cost accordingly.
+- Billing is prorated within the current billing cycle.
+
+## Server types
+
+If you need more resources, choose a larger server type when creating a new cluster:
+
+| Type | vCPUs | RAM | Available Storage | Price/node |
+|------|-------|-----|-------------------|-----------|
+| Starter | 2 | 4 GB | 55 GB | $29/mo |
+| Growth | 4 | 8 GB | 135 GB | $39/mo |
+| Scale | 8 | 16 GB | 295 GB | $59/mo |

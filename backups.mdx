@@ -1,0 +1,116 @@
+---
+title: "Backups & Restore"
+description: "Automated backups, retention policies, and point-in-time recovery"
+---
+
+## Overview
+
+Rivestack HA clusters include automated daily backups stored in S3-compatible object storage. Backups use [pgBackRest](https://pgbackrest.org/), the industry-standard backup tool for PostgreSQL, with support for full backups and point-in-time recovery (PITR).
+
+<Info>Automated backups are available on **HA clusters** only. Free tier databases do not include backups.</Info>
+
+## How backups work
+
+- **Backup tool**: pgBackRest
+- **Storage**: S3-compatible object storage (off-site, separate from your database nodes)
+- **Backup type**: Full backups
+- **WAL archiving**: Continuous WAL (Write-Ahead Log) archiving for point-in-time recovery
+- **Encryption**: Backups are encrypted at rest in S3
+
+Every backup captures a consistent snapshot of your entire PostgreSQL cluster, including all databases, users, and extensions.
+
+## Automated schedule
+
+By default, backups run **daily at 3:00 AM UTC**. You can customize the schedule from the dashboard.
+
+### View backup schedule
+
+1. Navigate to your HA cluster in the dashboard.
+2. Open the **Backup** tab.
+3. The current schedule is shown at the top.
+
+### Change backup schedule
+
+1. Open the **Backup** tab of your cluster.
+2. Click on the backup schedule configuration.
+3. Set your preferred cron schedule.
+4. Save changes.
+
+## Retention
+
+| Setting | Default |
+|---------|---------|
+| Full backup retention | 7 days |
+
+Backups older than the retention period are automatically deleted.
+
+## Manual backups
+
+You can trigger a backup at any time:
+
+1. Navigate to your cluster's **Backup** tab.
+2. Click **Create Backup**.
+3. The backup starts immediately. You can monitor progress in real time.
+
+Each backup record shows:
+
+- Backup name and type
+- Size (in MB)
+- Status (running, success, failed)
+- Timestamp
+
+## Restore
+
+Rivestack supports three restore methods:
+
+### Restore from latest backup
+
+Restores your cluster to the most recent successful backup.
+
+1. Open the **Backup** tab.
+2. Click the restore icon on the desired backup.
+3. Select **Latest** as the restore type.
+4. Type "I confirm" to proceed.
+5. Click **Restore**.
+
+### Point-in-time recovery (PITR)
+
+Restore your cluster to any specific moment within your backup retention window. This is useful for recovering from accidental data deletion or corruption.
+
+1. Open the **Backup** tab.
+2. Click the restore icon.
+3. Select **PITR** as the restore type.
+4. Choose the target **date and time** (UTC).
+5. Type "I confirm" to proceed.
+6. Click **Restore**.
+
+<Warning>PITR requires continuous WAL archiving. The target timestamp must fall within the retention window of your backups.</Warning>
+
+### Restore from a specific backup
+
+Choose a specific backup from your history to restore from.
+
+1. Open the **Backup** tab.
+2. Click the restore icon.
+3. Select **Specific backup** as the restore type.
+4. Choose the backup from the dropdown.
+5. Type "I confirm" to proceed.
+6. Click **Restore**.
+
+## What to expect during a restore
+
+- The restore runs as a background job. You can monitor progress in real time on the dashboard.
+- Your cluster will show a **Restoring** status during the operation.
+- Existing data on the cluster will be replaced with the restored data.
+- Connections may be briefly interrupted during the restore.
+- You'll receive an email notification when the restore completes.
+
+## Restore history
+
+View all past restore operations in the **Backup** tab. Each record shows:
+
+- Source backup
+- Restore type (latest, PITR, specific)
+- Status (success, failed, running)
+- Start and finish timestamps
+- Error details (if failed)

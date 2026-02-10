@@ -1,0 +1,113 @@
+---
+title: "High Availability"
+description: "How automatic failover keeps your database online"
+---
+
+## Overview
+
+Rivestack HA clusters use [Patroni](https://github.com/patroni/patroni) for automatic failover and cluster management. When a primary node fails, a replica is promoted within seconds — no manual intervention required.
+
+## Architecture
+
+Each HA cluster consists of:
+
+- **1-3 PostgreSQL nodes** — one primary (read-write) and zero or more replicas (read-only)
+- **2 HAProxy load balancers** — route connections to the correct node with a floating VIP (Virtual IP)
+- **etcd** — distributed consensus store for leader election
+- **Patroni** — cluster manager that handles replication, failover, and health checks
+
+```
+                    ┌──────────────┐
+   Clients ────────►│   HAProxy    │
+                    │  (VIP: 5432) │
+                    └──────┬───────┘
+                           │
+              ┌────────────┼────────────┐
+              ▼            ▼            ▼
+         ┌─────────┐ ┌─────────┐ ┌─────────┐
+         │ Primary  │ │ Replica │ │ Replica │
+         │ (node 1) │ │ (node 2)│ │ (node 3)│
+         └─────────┘ └─────────┘ └─────────┘
+              │            ▲            ▲
+              └──── streaming replication──┘
+```
+
+## How failover works
+
+1. **Detection** — Patroni continuously monitors the health of each PostgreSQL node. If the primary becomes unresponsive, Patroni detects the failure within seconds.
+
+2. **Leader election** — Patroni uses etcd to coordinate leader election. The healthiest replica with the least replication lag is selected as the new primary.
+
+3. **Promotion** — The selected replica is promoted to primary. It begins accepting writes immediately.
+
+4. **Routing** — HAProxy detects the topology change and routes new connections to the new primary. Existing connections to the old primary are terminated.
+
+5. **Recovery** — When the failed node comes back online, it automatically rejoins the cluster as a replica and begins streaming from the new primary.
+
+## Failover expectations
+
+| Metric | Value |
+|--------|-------|
+| **Detection time** | ~5-10 seconds |
+| **Promotion time** | ~5-15 seconds |
+| **Total failover time** | ~10-30 seconds |
+| **Data loss** | Zero (synchronous commit with streaming replication) |
+
+<Info>During failover, active connections to the old primary will be dropped. Your application should implement connection retry logic to handle brief interruptions.</Info>
+
+## Replication
+
+Rivestack uses PostgreSQL **streaming replication** to keep replicas in sync with the primary:
+
+- WAL (Write-Ahead Log) records are streamed from primary to replicas in real time.
+- Replicas can serve read-only queries to offload the primary.
+- Replication lag is monitored and visible in the dashboard Metrics tab.
+
+### Replication lag
+
+Monitor replication lag for each replica in the dashboard:
+
+- **Lag time** — How far behind the replica is (in seconds)
+- **Lag bytes** — Size of un-replayed WAL data
+
+Under normal conditions, replication lag is sub-second. High write throughput or network issues can temporarily increase lag.
+
+## Node roles
+
+| Role | Reads | Writes | Count |
+|------|-------|--------|-------|
+| **Primary** | Yes | Yes | Exactly 1 |
+| **Replica** | Yes | No | 0-2 |
+
+## Connection routing
+
+HAProxy provides transparent routing through different ports:
+
+| Port | Routes to | Use case |
+|------|-----------|----------|
+| `5432` | Primary | Default — all read/write traffic |
+| `5001` | All replicas | Read-only queries for load distribution |
+| `5002` | Synchronous replicas | Guaranteed consistency reads |
+| `5003` | Asynchronous replicas | Eventually consistent reads |
+
+For most applications, use port `5432` — HAProxy automatically handles failover and routes to the current primary.
+
+## Best practices
+
+<AccordionGroup>
+  <Accordion title="Implement connection retry logic">
+    During failover, connections to the old primary are terminated. Your application should:
+    - Catch connection errors and retry after a short delay (1-3 seconds).
+    - Use exponential backoff for retries.
+    - Most PostgreSQL drivers handle reconnection automatically if configured.
+  </Accordion>
+  <Accordion title="Use at least 2 nodes">
+    A single-node cluster has no failover target. Run at least 2 nodes in production to ensure automatic recovery from node failures.
+  </Accordion>
+  <Accordion title="Monitor replication lag">
+    Check the Metrics tab regularly. Sustained replication lag may indicate the replica needs more resources or there are network issues.
+  </Accordion>
+  <Accordion title="Test failover">
+    Verify your application handles failover gracefully by observing behavior during planned maintenance windows.
+  </Accordion>
+</AccordionGroup>

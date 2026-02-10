@@ -1,0 +1,192 @@
+---
+title: "pgvector Setup"
+description: "Store and query vector embeddings for AI applications"
+---
+
+## Overview
+
+Every Rivestack database comes with [pgvector](https://github.com/pgvector/pgvector) pre-installed. pgvector adds vector similarity search to PostgreSQL, letting you store embeddings from OpenAI, Cohere, Hugging Face, or any other model alongside your relational data.
+
+<Info>pgvector is enabled by default on all Rivestack databases — no installation or configuration needed.</Info>
+
+## Enable the extension
+
+pgvector is pre-installed, but you need to enable it in your database:
+
+```sql
+CREATE EXTENSION IF NOT EXISTS vector;
+```
+
+Verify it's active:
+
+```sql
+SELECT extname, extversion FROM pg_extension WHERE extname = 'vector';
+```
+
+## Store embeddings
+
+### Create a table with a vector column
+
+```sql
+CREATE TABLE documents (
+    id BIGSERIAL PRIMARY KEY,
+    content TEXT NOT NULL,
+    embedding VECTOR(1536)  -- OpenAI ada-002 dimensions
+);
+```
+
+The `VECTOR(n)` type stores n-dimensional vectors. Common dimension sizes:
+
+| Model | Dimensions |
+|-------|-----------|
+| OpenAI text-embedding-ada-002 | 1536 |
+| OpenAI text-embedding-3-small | 1536 |
+| OpenAI text-embedding-3-large | 3072 |
+| Cohere embed-english-v3.0 | 1024 |
+| BGE-small-en | 384 |
+
+### Insert vectors
+
+```sql
+INSERT INTO documents (content, embedding)
+VALUES (
+    'Rivestack is a managed PostgreSQL service',
+    '[0.1, 0.2, 0.3, ...]'  -- your embedding vector
+);
+```
+
+### From Python with OpenAI
+
+```python
+import psycopg2
+import openai
+
+# Generate embedding
+response = openai.embeddings.create(
+    model="text-embedding-ada-002",
+    input="Rivestack is a managed PostgreSQL service"
+)
+embedding = response.data[0].embedding
+
+# Store in Rivestack
+conn = psycopg2.connect("postgresql://user:pass@host:5432/mydb?sslmode=require")
+cur = conn.cursor()
+cur.execute(
+    "INSERT INTO documents (content, embedding) VALUES (%s, %s)",
+    ("Rivestack is a managed PostgreSQL service", str(embedding))
+)
+conn.commit()
+```
+
+## Query vectors
+
+### Similarity search
+
+Find the 5 most similar documents using cosine distance:
+
+```sql
+SELECT id, content, embedding <=> '[0.1, 0.2, 0.3, ...]' AS distance
+FROM documents
+ORDER BY embedding <=> '[0.1, 0.2, 0.3, ...]'
+LIMIT 5;
+```
+
+### Distance operators
+
+| Operator | Distance Metric | Use Case |
+|----------|----------------|----------|
+| `<->` | L2 (Euclidean) | General purpose |
+| `<=>` | Cosine | Text embeddings (most common) |
+| `<#>` | Inner product | When vectors are normalized |
+
+## Create an index
+
+For tables with more than a few thousand rows, create an index to speed up queries:
+
+### HNSW index (recommended)
+
+```sql
+CREATE INDEX ON documents
+USING hnsw (embedding vector_cosine_ops)
+WITH (m = 16, ef_construction = 200);
+```
+
+HNSW provides fast, approximate nearest-neighbor search with good recall. Tuning parameters:
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `m` | 16 | Max connections per node. Higher = better recall, more memory. |
+| `ef_construction` | 64 | Build-time search width. Higher = better recall, slower builds. |
+
+Set the search parameter at query time:
+
+```sql
+SET hnsw.ef_search = 100;  -- default is 40
+```
+
+### IVFFlat index
+
+```sql
+CREATE INDEX ON documents
+USING ivfflat (embedding vector_cosine_ops)
+WITH (lists = 100);
+```
+
+IVFFlat requires a training step and works best when you set `lists` to `rows / 1000` for tables up to 1M rows.
+
+```sql
+SET ivfflat.probes = 10;  -- default is 1, higher = better recall
+```
+
+### Which index to use?
+
+| | HNSW | IVFFlat |
+|-|------|---------|
+| Recall | Higher | Lower |
+| Build speed | Slower | Faster |
+| Query speed | Fast | Fast |
+| Memory | More | Less |
+| Recommendation | Default choice | Large datasets with limited memory |
+
+## RAG example
+
+A complete retrieval-augmented generation (RAG) pattern:
+
+```python
+import psycopg2
+import openai
+
+def search(query: str, top_k: int = 5):
+    # 1. Generate embedding for the query
+    response = openai.embeddings.create(
+        model="text-embedding-ada-002",
+        input=query
+    )
+    query_embedding = response.data[0].embedding
+
+    # 2. Search Rivestack for similar documents
+    conn = psycopg2.connect("postgresql://user:pass@host:5432/mydb?sslmode=require")
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT content, embedding <=> %s::vector AS distance
+        FROM documents
+        ORDER BY embedding <=> %s::vector
+        LIMIT %s
+    """, (str(query_embedding), str(query_embedding), top_k))
+
+    results = cur.fetchall()
+    conn.close()
+    return results
+
+# 3. Use results as context for your LLM
+results = search("How does Rivestack handle backups?")
+context = "\n".join([row[0] for row in results])
+```
+
+## Performance tips
+
+- **Always create an index** for tables over a few thousand rows. Without an index, pgvector scans every row.
+- **Use HNSW** as your default index type. It offers the best recall/speed trade-off.
+- **Increase `ef_search`** if recall is too low. Start with 100 and increase as needed.
+- **Batch inserts** for loading large datasets. Use `COPY` or multi-row `INSERT` for best throughput.
+- **Choose the right distance operator** for your use case. Cosine (`<=>`) is the most common for text embeddings.

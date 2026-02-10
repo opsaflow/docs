@@ -1,0 +1,94 @@
+---
+title: "FAQ"
+description: "Frequently asked questions about Rivestack"
+---
+
+<AccordionGroup>
+  <Accordion title="What PostgreSQL version does Rivestack use?">
+    Rivestack runs **PostgreSQL 17**, the latest stable release.
+  </Accordion>
+
+  <Accordion title="Is pgvector included?">
+    Yes. pgvector is pre-installed on every Rivestack database (both Free and HA tiers). Enable it with `CREATE EXTENSION IF NOT EXISTS vector;`.
+  </Accordion>
+
+  <Accordion title="What extensions are available?">
+    HA clusters support 25+ PostgreSQL extensions including:
+    - **pgvector** — Vector similarity search
+    - **PostGIS** — Geospatial data
+    - **TimescaleDB** — Time-series data
+    - **pg_stat_statements** — Query performance tracking
+    - **pgcrypto** — Cryptographic functions
+    - **pg_trgm** — Trigram text search
+    - **uuid-ossp** — UUID generation
+
+    You can install extensions from the Management tab in the dashboard.
+  </Accordion>
+
+  <Accordion title="Are connections encrypted?">
+    Yes. All connections require SSL/TLS (`sslmode=require`). Unencrypted connections are rejected. No CA certificate download is needed.
+  </Accordion>
+
+  <Accordion title="What happens if a node fails?">
+    On HA clusters with 2 or more nodes, failover is automatic. Patroni detects the failure and promotes a replica to primary within 10-30 seconds. HAProxy reroutes connections to the new primary. Your connection string does not change.
+
+    Single-node clusters do not have automatic failover. We recommend at least 2 nodes for production.
+  </Accordion>
+
+  <Accordion title="How do backups work?">
+    HA clusters include automated daily backups via pgBackRest, stored in S3-compatible object storage. Backups are retained for 7 days. You can also trigger manual backups and restore to any point in time within the retention window. See the [Backups & Restore](/backups) guide for details.
+  </Accordion>
+
+  <Accordion title="Can I restore to a specific point in time?">
+    Yes. Rivestack supports point-in-time recovery (PITR) on HA clusters. Continuous WAL archiving lets you restore to any second within your backup retention window. Initiate a restore from the Backup tab in the dashboard.
+  </Accordion>
+
+  <Accordion title="What regions are available?">
+    - **EU Central** — Falkenstein, Germany
+    - **US East** — Virginia, USA
+    - **Asia** — Singapore
+
+    All plans and features are available in all regions at the same pricing.
+  </Accordion>
+
+  <Accordion title="Can I scale my cluster?">
+    Yes. You can add or remove nodes (between 1 and 3) from the Management tab. Adding a node provisions a new replica that joins your cluster automatically. See the [Scaling](/scaling) guide.
+
+    Vertical scaling (changing server type) is not yet supported. To upgrade, create a new cluster with the desired server type and migrate your data.
+  </Accordion>
+
+  <Accordion title="What are the connection limits?">
+    - **Free tier**: 5 connections per database
+    - **HA clusters**: 100 connections per cluster
+
+    Use connection pooling in your application if you need more concurrent connections.
+  </Accordion>
+
+  <Accordion title="How is billing handled?">
+    HA clusters are billed monthly per node. Payment is processed via credit card through our payment provider. Scaling changes (adding/removing nodes) are prorated within your billing cycle. You can cancel anytime from the Billing page.
+  </Accordion>
+
+  <Accordion title="Can I cancel my subscription?">
+    Yes. Cancel anytime from the **Billing** page in the dashboard. Your cluster remains active until the end of the current billing period.
+  </Accordion>
+
+  <Accordion title="Where is my data stored?">
+    Your data is stored on dedicated servers in the region you selected (EU, US, or Asia). Backups are stored in S3-compatible object storage in the same region. Data is encrypted at rest and in transit.
+  </Accordion>
+
+  <Accordion title="Do you support read replicas?">
+    Yes. HA clusters with 2 or more nodes include read replicas. Connect to port `5001` for read-only queries distributed across replicas. See the [Connection Guide](/connection-guide) for details.
+  </Accordion>
+
+  <Accordion title="Is there a free trial for HA clusters?">
+    There is no free trial for HA clusters, but the **Free tier** lets you explore Rivestack at no cost with a shared PostgreSQL database (4 GB storage, 5 connections).
+  </Accordion>
+
+  <Accordion title="Can I restrict access by IP?">
+    Yes. HA clusters include firewall rules. Configure allowed IP addresses from the **Firewall** tab in the dashboard. Only connections from allowed IPs will be accepted.
+  </Accordion>
+
+  <Accordion title="How do I monitor my database?">
+    The dashboard provides real-time metrics including TPS, connections, CPU, memory, disk I/O, cache hit ratio, and replication lag. View historical data over 1 hour, 24 hours, or 7 days. See the [Monitoring](/monitoring) guide.
+  </Accordion>
+</AccordionGroup>

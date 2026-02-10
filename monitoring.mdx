@@ -1,0 +1,103 @@
+---
+title: "Monitoring"
+description: "Real-time metrics and health monitoring for your database clusters"
+---
+
+## Overview
+
+Rivestack provides built-in monitoring for all HA clusters. Metrics are collected via Prometheus exporters running on each node, with data available through the dashboard or API.
+
+<Info>Monitoring is available on **HA clusters** only. Free tier databases show basic usage metrics.</Info>
+
+## Dashboard metrics
+
+Navigate to the **Metrics** tab of your HA cluster to view real-time and historical data.
+
+### Time ranges
+
+Select from three predefined ranges:
+
+| Range | Sampling interval |
+|-------|------------------|
+| 1 hour | 1 minute |
+| 24 hours | 10 minutes |
+| 7 days | 1 hour |
+
+### PostgreSQL metrics
+
+| Metric | Description |
+|--------|-------------|
+| **TPS** | Transactions per second (commits + rollbacks) |
+| **Active connections** | Current number of active connections |
+| **Cache hit ratio** | Buffer cache effectiveness (higher is better) |
+| **Disk usage** | PostgreSQL data directory size and total disk usage |
+| **Replication lag** | Time and byte lag for replica nodes |
+| **Tuple operations** | Rows fetched, inserted, updated, and deleted per second |
+| **Deadlocks** | Number of deadlocks detected |
+
+### System metrics (per node)
+
+| Metric | Description |
+|--------|-------------|
+| **CPU usage** | User, system, and total CPU percentage |
+| **Memory usage** | Used, free, cached, and total memory |
+| **Disk I/O** | Read and write throughput (KB/s) |
+| **Network I/O** | Received and transmitted throughput (KB/s) |
+| **Disk space** | Used and total disk space with usage percentage |
+
+## Cluster health
+
+The dashboard shows a real-time health status for each cluster:
+
+| Status | Meaning |
+|--------|---------|
+| **Healthy** | All nodes are running and reachable |
+| **Degraded** | Some nodes are healthy, but not all |
+| **Critical** | No nodes are responding |
+
+Health status is also visible on the main dashboard as a badge on each cluster card, alongside a TPS sparkline chart showing recent transaction throughput.
+
+### Node topology
+
+The **Topology** tab shows each node in your cluster with:
+
+- Node name and role (primary or replica)
+- Current state (streaming, in archive recovery, stopped)
+- Replication lag (for replicas)
+- Timeline number
+
+## Accessing metrics
+
+### Dashboard
+
+The easiest way to view metrics is through the Rivestack dashboard at [app.rivestack.io](https://app.rivestack.io). Charts update automatically with the selected time range.
+
+### API
+
+You can query metrics programmatically via the Rivestack API:
+
+```bash
+# Current metrics for all nodes
+GET /api/ha/:id/metrics
+
+# Historical metrics per node
+GET /api/ha/:id/nodes/metrics?range=24h
+
+# TPS sparkline data
+GET /api/ha/:id/tps
+
+# Cluster health status
+GET /api/ha/:id/health
+```
+
+## Alerts and notifications
+
+Rivestack sends email notifications for key events:
+
+- Cluster provisioning complete
+- Backup success or failure
+- Restore operations
+- Node scaling operations
+- Cluster health changes
+
+Configure notification preferences in **Settings** from the dashboard sidebar.
