@@ -89,6 +89,12 @@
      "vscode"
    ]
   },
+  "redirects": [
+    {
+      "source": "/api-reference/:slug*",
+      "destination": "/"
+    }
+  ],
   "footer": {
     "socials": {
       "github": "https://github.com/rivestack"
