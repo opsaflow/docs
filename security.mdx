@@ -1,0 +1,71 @@
+---
+title: "Security"
+description: "SSL, encryption, network security, and compliance"
+---
+
+## Encryption
+
+### In transit
+
+All connections to Rivestack databases **require SSL/TLS**. Unencrypted connections are rejected at the protocol level.
+
+| Setting | Value |
+|---------|-------|
+| SSL mode | `require` (enforced) |
+| TLS version | TLS 1.2+ |
+| Certificate | Signed by trusted public CA |
+
+No CA certificate download is needed — standard PostgreSQL clients trust the certificate automatically.
+
+```
+postgresql://user:pass@host:5432/mydb?sslmode=require
+```
+
+### At rest
+
+- **Database storage**: Encrypted at the volume level on all nodes
+- **Backups**: Encrypted in S3-compatible object storage
+- **WAL archives**: Encrypted alongside backups
+
+## Network security
+
+### Private networking
+
+Database nodes communicate over private networks. Only the load balancer endpoint is exposed to the public internet.
+
+### Port access
+
+| Port | Service | Access |
+|------|---------|--------|
+| 5432 | PostgreSQL (primary) | Via load balancer |
+| 5001 | Read replicas | Via load balancer |
+| 5002 | Sync replicas | Via load balancer |
+| 5003 | Async replicas | Via load balancer |
+
+## Authentication
+
+- **Database users**: Username/password authentication over SSL
+- **Dashboard**: Authenticated via Auth0 with email verification
+- **API**: API key authentication (see [API Reference](/api-reference/introduction))
+
+## Infrastructure
+
+| Component | Details |
+|-----------|---------|
+| **Provider** | Hetzner Cloud |
+| **Data centers** | EU (Falkenstein, Germany), US (Virginia, USA) |
+| **Node isolation** | Dedicated VMs per HA cluster |
+| **Internal communication** | Private network between cluster nodes |
+| **Backups** | Stored in S3-compatible object storage, separate from database nodes |
+
+## Compliance
+
+| Standard | Status |
+|----------|--------|
+| **GDPR** | EU Central region stores all data within the EU |
+| **Encryption in transit** | Enforced on all connections |
+| **Encryption at rest** | All storage volumes and backups |
+
+## Reporting vulnerabilities
+
+If you discover a security vulnerability, please report it to [security@rivestack.com](mailto:security@rivestack.com).

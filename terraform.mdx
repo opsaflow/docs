@@ -1,0 +1,47 @@
+---
+title: "Terraform Provider"
+description: "Manage Rivestack databases as infrastructure-as-code"
+---
+
+## Coming soon
+
+The Rivestack Terraform provider is under development. It will let you manage databases, clusters, and backups as code.
+
+### Planned resources
+
+```hcl
+# Example of planned syntax (not yet available)
+
+resource "rivestack_cluster" "production" {
+  name        = "my-app-prod"
+  region      = "eu-central"
+  server_type = "growth"
+  nodes       = 3
+
+  backup {
+    schedule  = "0 3 * * *"
+    retention = 14
+  }
+}
+
+resource "rivestack_database" "app" {
+  cluster_id = rivestack_cluster.production.id
+  name       = "myapp"
+  extensions = ["vector", "pg_trgm"]
+}
+```
+
+### Planned features
+
+- **Cluster management** — Create, update, and delete HA clusters
+- **Database management** — Provision databases and manage extensions
+- **Backup configuration** — Set schedules and retention policies
+- **Import existing resources** — Bring current infrastructure under Terraform management
+
+## In the meantime
+
+You can use the [Rivestack API](/api-reference/introduction) to automate database management programmatically.
+
+## Get notified
+
+To be notified when the Terraform provider launches, reach out to [support@rivestack.com](mailto:support@rivestack.com) or watch the [GitHub repository](https://github.com/rivestack).

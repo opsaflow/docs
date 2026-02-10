@@ -1,0 +1,50 @@
+---
+title: "Regions"
+description: "Available regions and data residency"
+---
+
+## Available regions
+
+Rivestack databases can be deployed in the following regions:
+
+| Region | Location | Identifier | Free | HA |
+|--------|----------|------------|------|-----|
+| **EU Central** | Falkenstein, Germany | `eu-central` | Yes | Yes |
+| **US East** | Virginia, USA | `us-east` | Yes | Yes |
+
+<Info>All regions include the same features, performance, and pricing.</Info>
+
+## Choosing a region
+
+Select the region closest to your application servers for the lowest latency. Once a database or cluster is created, its region cannot be changed.
+
+| Your app is hosted in | Recommended region |
+|-----------------------|-------------------|
+| Europe | EU Central |
+| North America | US East |
+| Other | Choose the nearest |
+
+## Region details
+
+### EU Central — Falkenstein, Germany
+
+- **Provider**: Hetzner Cloud
+- **Data residency**: All data stored within the EU
+- **Compliance**: GDPR-compliant data processing
+- **Hostname pattern**: `rs-{id}.eu-central.db.rivestack.io`
+
+### US East — Virginia, USA
+
+- **Provider**: Hetzner Cloud
+- **Data residency**: All data stored within the US
+- **Hostname pattern**: `rs-{id}.us-east.db.rivestack.io`
+
+## Cross-region considerations
+
+- Each database lives in a single region. There is no built-in cross-region replication.
+- Backups are stored in the same region as your database.
+- For multi-region architectures, create separate clusters in each region and handle replication at the application level.
+
+## Upcoming regions
+
+We're evaluating additional regions based on demand. If you need a specific region, reach out to [support@rivestack.com](mailto:support@rivestack.com).

@@ -3,6 +3,66 @@ title: "Connection Guide"
 description: "Connect to your Rivestack PostgreSQL database from any language"
 ---
 
+## Quick connect
+
+Copy your connection string from the dashboard and use it directly:
+
+<Tabs>
+  <Tab title="Python">
+    ```bash
+    pip install psycopg2-binary
+    ```
+
+    ```python
+    import psycopg2
+
+    conn = psycopg2.connect("postgresql://user:pass@rs-xxx.eu-central.db.rivestack.io:5432/mydb?sslmode=require")
+    cur = conn.cursor()
+    cur.execute("SELECT 1")
+    print(cur.fetchone())
+    conn.close()
+    ```
+  </Tab>
+  <Tab title="Node.js">
+    ```bash
+    npm install pg
+    ```
+
+    ```javascript
+    const { Client } = require('pg');
+
+    const client = new Client({
+      connectionString: 'postgresql://user:pass@rs-xxx.eu-central.db.rivestack.io:5432/mydb?sslmode=require',
+      ssl: { rejectUnauthorized: false }
+    });
+
+    await client.connect();
+    const res = await client.query('SELECT 1');
+    console.log(res.rows[0]);
+    await client.end();
+    ```
+  </Tab>
+  <Tab title="Go">
+    ```bash
+    go get github.com/jackc/pgx/v5
+    ```
+
+    ```go
+    conn, err := pgx.Connect(context.Background(),
+        "postgresql://user:pass@rs-xxx.eu-central.db.rivestack.io:5432/mydb?sslmode=require")
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer conn.Close(context.Background())
+    ```
+  </Tab>
+  <Tab title="psql">
+    ```bash
+    psql "postgresql://user:pass@rs-xxx.eu-central.db.rivestack.io:5432/mydb?sslmode=require"
+    ```
+  </Tab>
+</Tabs>
+
 ## Connection details
 
 Find your connection credentials in the Rivestack dashboard under the **Connection** tab of your database or cluster.
@@ -234,7 +294,7 @@ For HA clusters, connections are routed through a load balancer that automatical
   <Accordion title="Connection refused">
     - Verify your host, port, and credentials are correct.
     - Ensure you're using `sslmode=require`.
-    - Check that your IP is allowed in the cluster firewall settings.
+    - Check that your host and port are correct.
   </Accordion>
   <Accordion title="SSL errors">
     All connections require SSL. Make sure your client is configured with `sslmode=require`. You do not need to download a CA certificate.

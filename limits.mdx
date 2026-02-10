@@ -1,0 +1,108 @@
+---
+title: "Limits"
+description: "Connection limits, storage, and resource quotas"
+---
+
+## Plan limits
+
+| Resource | Free | HA Cluster |
+|----------|------|------------|
+| **Databases per account** | 2 | Unlimited |
+| **Connections per database** | 5 | 100 |
+| **Storage** | 4 GB per database | Depends on server type |
+| **Nodes** | Shared | 1–3 dedicated |
+| **Backups** | Not included | Daily, 14-day retention |
+| **Point-in-time recovery** | Not included | Included |
+| **Monitoring** | Basic | Full metrics |
+| **SQL Editor** | Not included | Included |
+| **Extensions** | pgvector only | 25+ extensions |
+
+## Storage per server type
+
+| Server type | Available storage | vCPUs | RAM | Price |
+|-------------|-------------------|-------|-----|-------|
+| **Starter** | 55 GB | 2 | 4 GB | $29/node/mo |
+| **Growth** | 135 GB | 4 | 8 GB | $39/node/mo |
+| **Scale** | 295 GB | 8 | 16 GB | $59/node/mo |
+
+<Info>Storage is local NVMe SSD. All nodes in a cluster use the same server type.</Info>
+
+## Connection limits
+
+| Tier | Max connections | Recommendation |
+|------|----------------|----------------|
+| **Free** | 5 | Development and testing only |
+| **HA Cluster** | 100 | Use connection pooling for high-concurrency apps |
+
+### Connection pooling
+
+For applications that need more than 100 concurrent connections, use a client-side connection pool:
+
+<Tabs>
+  <Tab title="Python">
+    ```python
+    from psycopg2 import pool
+
+    connection_pool = pool.ThreadedConnectionPool(
+        minconn=5,
+        maxconn=20,
+        dsn="postgresql://user:pass@host:5432/mydb?sslmode=require"
+    )
+
+    conn = connection_pool.getconn()
+    # ... use connection ...
+    connection_pool.putconn(conn)
+    ```
+  </Tab>
+  <Tab title="Node.js">
+    ```javascript
+    const { Pool } = require('pg');
+
+    const pool = new Pool({
+      connectionString: 'postgresql://user:pass@host:5432/mydb?sslmode=require',
+      max: 20,
+      ssl: { rejectUnauthorized: false }
+    });
+
+    const res = await pool.query('SELECT 1');
+    ```
+  </Tab>
+  <Tab title="Go">
+    ```go
+    // pgx pool handles connection pooling automatically
+    pool, err := pgxpool.New(context.Background(),
+        "postgresql://user:pass@host:5432/mydb?sslmode=require")
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer pool.Close()
+
+    var result int
+    err = pool.QueryRow(context.Background(), "SELECT 1").Scan(&result)
+    ```
+  </Tab>
+</Tabs>
+
+## Cluster limits
+
+| Resource | Limit |
+|----------|-------|
+| **Nodes per cluster** | 1–3 |
+| **Clusters per account** | No hard limit |
+| **Databases per cluster** | No hard limit (storage permitting) |
+| **Extensions per database** | 25+ available |
+| **Max vector dimensions** | 16,000 (pgvector) |
+
+## Rate limits
+
+| Action | Limit |
+|--------|-------|
+| **API requests** | 60 requests/minute |
+| **Cluster operations** (create, scale, restore) | 1 at a time per cluster |
+| **Manual backups** | 1 at a time per cluster |
+
+## Exceeding limits
+
+- **Storage full**: Write operations will fail. Scale to a larger server type or delete unused data.
+- **Connection limit reached**: New connections are rejected. Close idle connections or implement connection pooling.
+- **API rate limit**: Requests return HTTP 429. Retry with exponential backoff.

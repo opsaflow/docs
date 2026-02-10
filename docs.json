@@ -28,13 +28,17 @@
               "high-availability",
               "backups",
               "monitoring",
-              "scaling"
+              "scaling",
+              "security",
+              "regions"
             ]
           },
           {
             "group": "Resources",
             "pages": [
               "pricing",
+              "limits",
+              "terraform",
               "faq"
             ]
           }
