@@ -8,6 +8,11 @@
     "dark": "#1A2BB0"
   },
   "favicon": "/favicon.svg",
+  "fonts": {
+    "family": "Satoshi",
+    "source": "https://cdn.fontshare.com/wf/NWBQYJIM7GCZ5XWD7D26ARB3VDY55ZRT/K63EV2KZIGKLE7RANQ2U42S6SVHU5RJ7/X6XYTKIVDUW7GZTZPZNN4EUM5KH54KHF.woff2",
+    "format": "woff2"
+  },
   "navigation": {
     "tabs": [
       {
@@ -40,6 +45,13 @@
               "limits",
               "terraform",
               "faq"
+            ]
+          },
+          {
+            "group": "Legal",
+            "pages": [
+              "terms",
+              "privacy"
             ]
           }
         ]
