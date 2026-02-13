@@ -1,47 +1,318 @@
 ---
 title: "Terraform Provider"
-description: "Manage Rivestack databases as infrastructure-as-code"
+description: "Manage Rivestack HA PostgreSQL clusters as infrastructure-as-code"
 ---
 
-## Coming soon
+The official [Rivestack Terraform provider](https://registry.terraform.io/providers/Rivestack/rivestack/latest) lets you manage clusters, databases, users, extensions, grants, and backups as code.
 
-The Rivestack Terraform provider is under development. It will let you manage databases, clusters, and backups as code.
+## Installation
 
-### Planned resources
+Add the provider to your Terraform configuration:
 
 ```hcl
-# Example of planned syntax (not yet available)
-
-resource "rivestack_cluster" "production" {
-  name        = "my-app-prod"
-  region      = "eu-central"
-  server_type = "growth"
-  nodes       = 3
-
-  backup {
-    schedule  = "0 3 * * *"
-    retention = 14
+terraform {
+  required_providers {
+    rivestack = {
+      source  = "rivestack/rivestack"
+      version = "~> 0.1"
+    }
   }
 }
 
-resource "rivestack_database" "app" {
+provider "rivestack" {}
+```
+
+Requires **Terraform >= 1.0**.
+
+## Authentication
+
+Get your API key from the [Rivestack Dashboard](https://app.rivestack.io). API keys use the `rsk_` prefix.
+
+<Tabs>
+  <Tab title="Environment variable (recommended)">
+    ```bash
+    export RIVESTACK_API_KEY="rsk_your_api_key"
+    ```
+  </Tab>
+  <Tab title="Provider configuration">
+    ```hcl
+    provider "rivestack" {
+      api_key = "rsk_your_api_key"
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Quick start
+
+This example creates a 2-node HA cluster with a database, user, pgvector extension, and automated backups:
+
+```hcl
+terraform {
+  required_providers {
+    rivestack = {
+      source  = "rivestack/rivestack"
+      version = "~> 0.1"
+    }
+  }
+}
+
+provider "rivestack" {}
+
+# Create an HA PostgreSQL cluster
+resource "rivestack_cluster" "production" {
+  name               = "production-cluster"
+  region             = "eu-central"
+  server_type        = "growth"
+  node_count         = 2
+  postgresql_version = 17
+}
+
+# Create a database
+resource "rivestack_cluster_database" "analytics" {
   cluster_id = rivestack_cluster.production.id
-  name       = "myapp"
-  extensions = ["vector", "pg_trgm"]
+  name       = "analytics"
+  owner      = rivestack_cluster.production.db_user
+}
+
+# Create a user
+resource "rivestack_cluster_user" "app_user" {
+  cluster_id = rivestack_cluster.production.id
+  username   = "app_user"
+}
+
+# Grant write access
+resource "rivestack_cluster_grant" "app_write" {
+  cluster_id = rivestack_cluster.production.id
+  username   = rivestack_cluster_user.app_user.username
+  database   = rivestack_cluster_database.analytics.name
+  access     = "write"
+}
+
+# Install pgvector
+resource "rivestack_cluster_extension" "vector" {
+  cluster_id = rivestack_cluster.production.id
+  extension  = "vector"
+  database   = rivestack_cluster_database.analytics.name
+}
+
+# Configure automated backups
+resource "rivestack_cluster_backup_config" "production" {
+  cluster_id     = rivestack_cluster.production.id
+  enabled        = true
+  schedule       = "0 3 * * *"
+  retention_full = 14
+}
+
+# Outputs
+output "cluster_host" {
+  value = rivestack_cluster.production.host
+}
+
+output "connection_string" {
+  value     = rivestack_cluster.production.connection_string
+  sensitive = true
+}
+
+output "app_user_password" {
+  value     = rivestack_cluster_user.app_user.password
+  sensitive = true
 }
 ```
 
-### Planned features
+```bash
+terraform init
+terraform plan
+terraform apply
+```
 
-- **Cluster management** — Create, update, and delete HA clusters
-- **Database management** — Provision databases and manage extensions
-- **Backup configuration** — Set schedules and retention policies
-- **Import existing resources** — Bring current infrastructure under Terraform management
+## Resources
 
-## In the meantime
+### rivestack_cluster
 
-You can use the Rivestack dashboard at [app.rivestack.io](https://app.rivestack.io) to manage your databases.
+Manages an HA PostgreSQL cluster.
 
-## Get notified
+```hcl
+resource "rivestack_cluster" "example" {
+  name               = "my-cluster"
+  region             = "eu-central"
+  server_type        = "starter"
+  node_count         = 2
+  postgresql_version = 17
+}
+```
 
-To be notified when the Terraform provider launches, reach out to [support@rivestack.com](mailto:support@rivestack.com) or watch the [GitHub repository](https://github.com/rivestack).
+| Attribute | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `name` | String | Yes | Display name for the cluster |
+| `region` | String | Yes | Region: `eu-central` or `us-east` |
+| `server_type` | String | No | Server size: `starter`, `growth`, or `scale` |
+| `node_count` | Number | No | Number of nodes (1-3) |
+| `postgresql_version` | Number | No | PostgreSQL major version |
+| `db_name` | String | No | Name of the default database |
+| `db_type` | String | No | Cluster type: `ha` or `core_solo` |
+| `extensions` | List | No | Extensions to install at creation time |
+
+**Read-only attributes:** `id`, `host`, `connection_string`, `db_user`, `db_password`, `status`, `tenant_id`, `created_at`, `updated_at`
+
+### rivestack_cluster_database
+
+Creates a database on a cluster.
+
+```hcl
+resource "rivestack_cluster_database" "example" {
+  cluster_id = rivestack_cluster.example.id
+  name       = "analytics"
+  owner      = rivestack_cluster.example.db_user
+}
+```
+
+| Attribute | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `cluster_id` | String | Yes | ID of the cluster |
+| `name` | String | Yes | Database name |
+| `owner` | String | No | Database owner username (defaults to cluster's default user) |
+
+### rivestack_cluster_user
+
+Creates a database user with an auto-generated password.
+
+```hcl
+resource "rivestack_cluster_user" "example" {
+  cluster_id = rivestack_cluster.example.id
+  username   = "app_user"
+}
+```
+
+| Attribute | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `cluster_id` | String | Yes | ID of the cluster |
+| `username` | String | Yes | Username (letters, numbers, underscores; max 63 chars) |
+
+**Read-only attributes:** `id`, `password` (sensitive)
+
+### rivestack_cluster_grant
+
+Grants a user access to a database.
+
+```hcl
+resource "rivestack_cluster_grant" "example" {
+  cluster_id = rivestack_cluster.example.id
+  username   = rivestack_cluster_user.example.username
+  database   = rivestack_cluster_database.example.name
+  access     = "read"
+}
+```
+
+| Attribute | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `cluster_id` | String | Yes | ID of the cluster |
+| `username` | String | Yes | Username to grant access to |
+| `database` | String | Yes | Database to grant access on |
+| `access` | String | No | Access level: `read` (SELECT) or `write` (SELECT, INSERT, UPDATE, DELETE) |
+
+<Info>Grant revocation is not currently supported by the API. Destroying this resource removes it from Terraform state only.</Info>
+
+### rivestack_cluster_extension
+
+Installs a PostgreSQL extension on a database.
+
+```hcl
+resource "rivestack_cluster_extension" "vector" {
+  cluster_id = rivestack_cluster.example.id
+  extension  = "vector"
+  database   = rivestack_cluster_database.example.name
+}
+```
+
+| Attribute | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `cluster_id` | String | Yes | ID of the cluster |
+| `extension` | String | Yes | Extension name (e.g., `vector`, `postgis`, `pg_trgm`) |
+| `database` | String | No | Target database (defaults to cluster's primary database) |
+
+<Info>Extensions cannot be removed from running clusters. Destroying this resource removes it from Terraform state only.</Info>
+
+### rivestack_cluster_backup_config
+
+Configures automated backups for a cluster.
+
+```hcl
+resource "rivestack_cluster_backup_config" "example" {
+  cluster_id     = rivestack_cluster.example.id
+  enabled        = true
+  schedule       = "0 3 * * *"
+  retention_full = 14
+}
+```
+
+| Attribute | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `cluster_id` | String | Yes | ID of the cluster |
+| `enabled` | Boolean | Yes | Whether automated backups are enabled |
+| `schedule` | String | No | Cron schedule (e.g., `"0 3 * * *"` for daily at 3 AM) |
+| `retention_full` | Number | No | Number of days to retain full backups |
+
+## Data sources
+
+### rivestack_cluster
+
+Read information about an existing cluster.
+
+```hcl
+data "rivestack_cluster" "existing" {
+  id = "42"
+}
+
+output "cluster_host" {
+  value = data.rivestack_cluster.existing.host
+}
+```
+
+**Read-only attributes:** `name`, `region`, `server_type`, `node_count`, `postgresql_version`, `host`, `connection_string`, `db_name`, `db_user`, `db_password`, `db_type`, `status`, `health_status`, `tenant_id`, `created_at`, `updated_at`
+
+### rivestack_server_types
+
+List available server configurations.
+
+```hcl
+data "rivestack_server_types" "available" {}
+```
+
+### rivestack_extensions
+
+List supported PostgreSQL extensions.
+
+```hcl
+data "rivestack_extensions" "available" {}
+```
+
+## Import
+
+Import existing resources into Terraform state:
+
+```bash
+# Cluster
+terraform import rivestack_cluster.example CLUSTER_ID
+
+# Database
+terraform import rivestack_cluster_database.example CLUSTER_ID/DATABASE_NAME
+
+# User
+terraform import rivestack_cluster_user.example CLUSTER_ID/USERNAME
+
+# Extension
+terraform import rivestack_cluster_extension.example CLUSTER_ID/EXTENSION/DATABASE
+
+# Grant
+terraform import rivestack_cluster_grant.example CLUSTER_ID/USERNAME/DATABASE
+
+# Backup config
+terraform import rivestack_cluster_backup_config.example CLUSTER_ID
+```
+
+## Links
+
+- [Terraform Registry](https://registry.terraform.io/providers/Rivestack/rivestack/latest)
+- [GitHub Repository](https://github.com/Rivestack/terraform-provider-rivestack)
+- [Examples](https://github.com/Rivestack/terraform-provider-rivestack/tree/main/examples)
