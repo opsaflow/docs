@@ -1,0 +1,91 @@
+---
+title: "Ask HN — Semantic Search Demo"
+description: "Live demo: semantic search over 30 days of Hacker News stories and comments, powered by Rivestack pgvector"
+---
+
+## Live Demo
+
+A single-page semantic search app over Hacker News, showcasing Rivestack pgvector in action.
+
+<CardGroup cols={2}>
+  <Card title="Try the demo" icon="magnifying-glass" href="https://ask.rivestack.io">
+    Search 30 days of HN stories and comments with natural language.
+  </Card>
+  <Card title="Source code" icon="github" href="https://github.com/Rivestack/rag-starter">
+    Full source code — backend, frontend, and Kubernetes deployment.
+  </Card>
+</CardGroup>
+
+## What it does
+
+Type a question, get semantically relevant Hacker News posts and comments — with real-time performance stats on every query.
+
+- **~4,000 stories** and **~40,000 chunks** indexed from the last 30 days of HN
+- **HNSW index** for fast cosine similarity search
+- **Performance stats** displayed on every query: vector query time, embedding time, chunks searched, index type
+- **Daily cron job** keeps a rolling 30-day window of fresh data
+
+## Architecture
+
+```
+User query → OpenAI embedding → pgvector HNSW search → ranked results
+```
+
+| Component | Stack |
+|-----------|-------|
+| **Database** | Rivestack PostgreSQL + pgvector |
+| **Backend** | Python, FastAPI, SQLAlchemy, asyncpg |
+| **Embeddings** | OpenAI `text-embedding-3-small` (1536 dims) |
+| **Frontend** | Vue 3, Vite, Tailwind CSS v4, shadcn-vue |
+| **Deployment** | Kubernetes, Helm, GitHub Actions CI/CD |
+
+## Performance
+
+Typical query performance on a **shared** Rivestack instance:
+
+| Metric | Time |
+|--------|------|
+| Vector query (pgvector) | **~12ms** |
+| OpenAI embedding | ~150ms |
+| Total API response | ~180ms |
+
+<Info>
+  These numbers are from a shared Rivestack instance. Dedicated instances deliver significantly faster performance.
+</Info>
+
+## Run it yourself
+
+### 1. Create a Rivestack database
+
+Sign up at [app.rivestack.io](https://app.rivestack.io) and create a database. pgvector is enabled by default.
+
+### 2. Clone and configure
+
+```bash
+git clone https://github.com/Rivestack/rag-starter.git
+cd rag-starter
+cp .env.example backend/.env
+```
+
+Edit `backend/.env` with your Rivestack `DATABASE_URL` and an `OPENAI_API_KEY`.
+
+### 3. Run with Docker Compose
+
+```bash
+docker compose up
+```
+
+- Backend: [http://localhost:8000](http://localhost:8000)
+- Frontend: [http://localhost:8080](http://localhost:8080)
+
+### 4. Load data
+
+```bash
+curl -X POST http://localhost:8000/api/ingest/initial
+```
+
+This fetches 30 days of HN stories, generates embeddings, and stores them in your Rivestack database. The first load runs in the background and takes a few minutes.
+
+### 5. Search
+
+Open [http://localhost:8080](http://localhost:8080) and start searching.

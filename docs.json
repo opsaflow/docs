@@ -39,19 +39,18 @@
             ]
           },
           {
+            "group": "Demos",
+            "pages": [
+              "ask-hn-demo"
+            ]
+          },
+          {
             "group": "Resources",
             "pages": [
               "pricing",
               "limits",
               "terraform",
               "faq"
-            ]
-          },
-          {
-            "group": "Legal",
-            "pages": [
-              "terms",
-              "privacy"
             ]
           }
         ]
