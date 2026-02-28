@@ -5,24 +5,18 @@ description: "Frequently asked questions about Rivestack"
 
 <AccordionGroup>
   <Accordion title="What PostgreSQL version does Rivestack use?">
-    Rivestack runs **PostgreSQL 17**, the latest stable release.
-  </Accordion>
-
-  <Accordion title="Is pgvector included?">
-    Yes. pgvector is pre-installed on every Rivestack database (both Free and HA tiers). Enable it with `CREATE EXTENSION IF NOT EXISTS vector;`.
+    Rivestack supports **PostgreSQL 16, 17, and 18**. You choose your major version when creating a cluster.
   </Accordion>
 
   <Accordion title="What extensions are available?">
-    HA clusters support 25+ PostgreSQL extensions including:
-    - **pgvector** — Vector similarity search
-    - **PostGIS** — Geospatial data
-    - **TimescaleDB** — Time-series data
-    - **pg_stat_statements** — Query performance tracking
-    - **pgcrypto** — Cryptographic functions
-    - **pg_trgm** — Trigram text search
+    Rivestack includes the following pre-installed extensions:
+    - **pgvector** — Vector similarity search for AI/ML embeddings
     - **uuid-ossp** — UUID generation
+    - **pg_stat_statements** — SQL execution statistics tracking
+    - **pgcrypto** — Cryptographic functions
+    - **pg_trgm** — Trigram matching for similarity searches
 
-    You can install extensions from the Management tab in the dashboard.
+    Extensions are managed through the dashboard UI. Navigate to your database and add extensions from there.
   </Accordion>
 
   <Accordion title="Are connections encrypted?">
@@ -30,7 +24,7 @@ description: "Frequently asked questions about Rivestack"
   </Accordion>
 
   <Accordion title="What happens if a node fails?">
-    On HA clusters with 2 or more nodes, failover is automatic. Patroni detects the failure and promotes a replica to primary within 10-30 seconds. HAProxy reroutes connections to the new primary. Your connection string does not change.
+    On HA clusters with 2 or more nodes, failover is automatic. Patroni detects the failure and promotes a replica to primary within 10-30 seconds. The load balancer reroutes connections to the new primary. Your connection string does not change.
 
     Single-node clusters do not have automatic failover. We recommend at least 2 nodes for production.
   </Accordion>
@@ -77,11 +71,11 @@ description: "Frequently asked questions about Rivestack"
   </Accordion>
 
   <Accordion title="Do you support read replicas?">
-    Yes. HA clusters with 2 or more nodes include read replicas. Connect to port `5001` for read-only queries distributed across replicas. See the [Connection Guide](/connection-guide) for details.
+    HA clusters with 2 or more nodes include replicas for automatic failover. Replicas are managed automatically — all connections go through port `5432` and the load balancer handles routing transparently.
   </Accordion>
 
   <Accordion title="Is there a free trial for HA clusters?">
-    There is no free trial for HA clusters, but the **Free tier** lets you explore Rivestack at no cost with a shared PostgreSQL database (4 GB storage, 5 connections).
+    There is no free trial for HA clusters, but the **Free tier** lets you explore Rivestack at no cost with a shared PostgreSQL database (2 GB storage, 5 connections).
   </Accordion>
 
   <Accordion title="How do I monitor my database?">

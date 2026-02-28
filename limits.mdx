@@ -9,21 +9,21 @@ description: "Connection limits, storage, and resource quotas"
 |----------|------|------------|
 | **Databases per account** | 2 | Unlimited |
 | **Connections per database** | 5 | 100 |
-| **Storage** | 4 GB per database | Depends on server type |
+| **Storage** | 2 GB per database | Depends on server type |
 | **Nodes** | Shared | 1–3 dedicated |
 | **Backups** | Not included | Daily, 14-day retention |
 | **Point-in-time recovery** | Not included | Included |
 | **Monitoring** | Basic | Full metrics |
 | **SQL Editor** | Not included | Included |
-| **Extensions** | pgvector only | 25+ extensions |
+| **Extensions** | pgvector only | 5 pre-installed extensions |
 
 ## Storage per server type
 
 | Server type | Available storage | vCPUs | RAM | Price |
 |-------------|-------------------|-------|-----|-------|
-| **Starter** | 55 GB | 2 | 4 GB | $29/node/mo |
-| **Growth** | 135 GB | 4 | 8 GB | $39/node/mo |
-| **Scale** | 295 GB | 8 | 16 GB | $59/node/mo |
+| **Starter** | 55 GB | 2 | 4 GB | $35/node/mo |
+| **Growth** | 135 GB | 4 | 8 GB | $59/node/mo |
+| **Scale** | 295 GB | 8 | 16 GB | $99/node/mo |
 
 <Info>Storage listed is fully available for your PostgreSQL database. An additional 20 GB is reserved for the operating system on each node. All nodes in a cluster use the same server type.</Info>
 
@@ -90,7 +90,7 @@ For applications that need more than 100 concurrent connections, use a client-si
 | **Nodes per cluster** | 1–3 |
 | **Clusters per account** | No hard limit |
 | **Databases per cluster** | No hard limit (storage permitting) |
-| **Extensions per database** | 25+ available |
+| **Extensions per database** | 5 available |
 | **Max vector dimensions** | 16,000 (pgvector) |
 
 ## Rate limits

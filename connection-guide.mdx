@@ -272,14 +272,7 @@ psql "postgresql://myuser:mypassword@rs-abc12345.eu-central.db.rivestack.io:5432
 
 For HA clusters, connections are routed through a load balancer that automatically directs traffic to the primary node.
 
-| Port | Target |
-|------|--------|
-| `5432` | Primary (read-write) |
-| `5001` | Replicas (read-only) |
-| `5002` | Synchronous replicas |
-| `5003` | Asynchronous replicas |
-
-<Info>For most applications, connect to port `5432`. The load balancer handles failover automatically — your application reconnects to the new primary without changing connection details.</Info>
+All connections use port `5432`. The load balancer handles failover automatically — your application reconnects to the new primary without changing connection details.
 
 ## Connection limits
 

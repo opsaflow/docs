@@ -9,10 +9,10 @@ Rivestack is a managed PostgreSQL service that gives you production-ready databa
 
 <CardGroup cols={2}>
   <Card title="Free Tier" icon="cube">
-    Shared PostgreSQL for development and testing. 4 GB storage, up to 5 connections. No credit card required.
+    Shared PostgreSQL for development and testing. 2 GB storage, up to 5 connections. No credit card required.
   </Card>
   <Card title="HA Cluster" icon="server">
-    Dedicated infrastructure with automatic failover, backups, and monitoring. Starting at $29/node/month.
+    Dedicated infrastructure with automatic failover, backups, and monitoring. Starting at $35/node/month.
   </Card>
 </CardGroup>
 
@@ -45,9 +45,9 @@ Create your Rivestack account at [app.rivestack.io](https://app.rivestack.io). Y
     5. Select a **server type**:
        | Type | vCPUs | RAM | Storage | Price |
        |------|-------|-----|---------|-------|
-       | Starter | 2 | 4 GB | 55 GB | $29/node/mo |
-       | Growth | 4 | 8 GB | 135 GB | $39/node/mo |
-       | Scale | 8 | 16 GB | 295 GB | $59/node/mo |
+       | Starter | 2 | 4 GB | 55 GB | $35/node/mo |
+       | Growth | 4 | 8 GB | 135 GB | $59/node/mo |
+       | Scale | 8 | 16 GB | 295 GB | $99/node/mo |
 
        Storage listed is fully available for your PostgreSQL database. 20 GB is reserved for the OS on each node.
     6. Choose the **number of nodes** (1-3). We recommend 2 or more for high availability.
@@ -85,8 +85,8 @@ postgresql://username:password@rs-abc12345.eu-central.db.rivestack.io:5432/mydb?
   <Card title="pgvector" icon="brain">
     Vector similarity search is pre-installed on every database. Build AI applications without extra setup.
   </Card>
-  <Card title="25+ Extensions" icon="puzzle-piece">
-    Popular extensions like PostGIS, TimescaleDB, pg_stat_statements, and pgcrypto are available out of the box.
+  <Card title="Extensions" icon="puzzle-piece">
+    Pre-installed extensions including uuid-ossp, pg_stat_statements, pgcrypto, and pg_trgm. Add them to your database from the dashboard.
   </Card>
   <Card title="SSL Encryption" icon="lock">
     All connections are encrypted with TLS. No unencrypted connections are allowed.

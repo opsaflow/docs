@@ -11,14 +11,14 @@ Rivestack HA clusters use [Patroni](https://github.com/patroni/patroni) for auto
 
 Each HA cluster consists of:
 
-- **1-3 PostgreSQL nodes** — one primary (read-write) and zero or more replicas (read-only)
-- **2 HAProxy load balancers** — route connections to the correct node with a floating VIP (Virtual IP)
+- **1-3 PostgreSQL nodes** — one primary and zero or more replicas for failover
+- **2 load balancers** — route connections to the correct node with a floating VIP (Virtual IP)
 - **etcd** — distributed consensus store for leader election
 - **Patroni** — cluster manager that handles replication, failover, and health checks
 
 ```
                     ┌──────────────┐
-   Clients ────────►│   HAProxy    │
+   Clients ────────►│Load Balancer │
                     │  (VIP: 5432) │
                     └──────┬───────┘
                            │
@@ -40,7 +40,7 @@ Each HA cluster consists of:
 
 3. **Promotion** — The selected replica is promoted to primary. It begins accepting writes immediately.
 
-4. **Routing** — HAProxy detects the topology change and routes new connections to the new primary. Existing connections to the old primary are terminated.
+4. **Routing** — The load balancer detects the topology change and routes new connections to the new primary. Existing connections to the old primary are terminated.
 
 5. **Recovery** — When the failed node comes back online, it automatically rejoins the cluster as a replica and begins streaming from the new primary.
 
@@ -60,7 +60,7 @@ Each HA cluster consists of:
 Rivestack uses PostgreSQL **streaming replication** to keep replicas in sync with the primary:
 
 - WAL (Write-Ahead Log) records are streamed from primary to replicas in real time.
-- Replicas can serve read-only queries to offload the primary.
+- Replicas are used for automatic failover.
 - Replication lag is monitored and visible in the dashboard Metrics tab.
 
 ### Replication lag
@@ -77,20 +77,11 @@ Under normal conditions, replication lag is sub-second. High write throughput or
 | Role | Reads | Writes | Count |
 |------|-------|--------|-------|
 | **Primary** | Yes | Yes | Exactly 1 |
-| **Replica** | Yes | No | 0-2 |
+| **Replica** | Failover only | No | 0-2 |
 
 ## Connection routing
 
-HAProxy provides transparent routing through different ports:
-
-| Port | Routes to | Use case |
-|------|-----------|----------|
-| `5432` | Primary | Default — all read/write traffic |
-| `5001` | All replicas | Read-only queries for load distribution |
-| `5002` | Synchronous replicas | Guaranteed consistency reads |
-| `5003` | Asynchronous replicas | Eventually consistent reads |
-
-For most applications, use port `5432` — HAProxy automatically handles failover and routes to the current primary.
+All connections go through port `5432`. The load balancer automatically routes traffic to the current primary and handles failover transparently — no configuration needed.
 
 ## Best practices
 

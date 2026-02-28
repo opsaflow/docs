@@ -12,7 +12,7 @@ description: "Plans, regions, and what's included"
     For development and testing.
 
     - Shared PostgreSQL instance
-    - 4 GB storage per database
+    - 2 GB storage per database
     - 5 concurrent connections
     - Up to 2 databases
     - pgvector included
@@ -20,7 +20,7 @@ description: "Plans, regions, and what's included"
     - All regions
   </Card>
   <Card title="HA Cluster" icon="server">
-    **Starting at $29/node/month**
+    **Starting at $35/node/month**
 
     For production workloads.
 
@@ -30,7 +30,7 @@ description: "Plans, regions, and what's included"
     - Automated daily backups (14-day retention)
     - Point-in-time recovery
     - Real-time monitoring
-    - pgvector + 25 extensions
+    - pgvector + 4 extensions
     - SSL encryption
     - Email notifications
     - All regions
@@ -46,7 +46,7 @@ HA clusters are available in three server configurations:
 | **vCPUs** | 2 | 4 | 8 |
 | **RAM** | 4 GB | 8 GB | 16 GB |
 | **Available storage** | 55 GB | 135 GB | 295 GB |
-| **Price** | $29/node/mo | $39/node/mo | $59/node/mo |
+| **Price** | $35/node/mo | $59/node/mo | $99/node/mo |
 
 Storage listed is fully available for your PostgreSQL database. An additional 20 GB is reserved for the OS on each node.
 
@@ -54,10 +54,10 @@ Storage listed is fully available for your PostgreSQL database. An additional 20
 
 | Configuration | Monthly cost |
 |---------------|-------------|
-| Growth, 2 nodes | $78/mo |
-| Growth, 3 nodes | $117/mo |
-| Scale, 2 nodes | $118/mo |
-| Starter, 1 node (no HA) | $29/mo |
+| Growth, 2 nodes | $118/mo |
+| Growth, 3 nodes | $177/mo |
+| Scale, 2 nodes | $198/mo |
+| Starter, 1 node (no HA) | $35/mo |
 
 ## Regions
 
@@ -75,15 +75,15 @@ Every HA cluster includes the following at no additional cost:
 
 | Feature | Details |
 |---------|---------|
-| **PostgreSQL 17** | Latest stable release |
+| **PostgreSQL 16, 17, 18** | Choose your major version at cluster creation |
 | **pgvector** | Vector similarity search for AI applications |
-| **25+ extensions** | PostGIS, TimescaleDB, pg_stat_statements, pgcrypto, pg_trgm, and more |
+| **Extensions** | uuid-ossp, pg_stat_statements, pgcrypto, pg_trgm (add via dashboard) |
 | **Automated backups** | Daily, with 14-day retention |
 | **Point-in-time recovery** | Restore to any second within retention window |
 | **Monitoring** | CPU, memory, disk, TPS, connections, cache hit ratio |
 | **SSL/TLS** | Enforced on all connections |
 | **High availability** | Patroni-managed automatic failover |
-| **Load balancing** | HAProxy with read/write splitting |
+| **Load balancing** | Automatic connection routing |
 | **Email notifications** | Provisioning, backups, health alerts |
 | **SQL Editor** | Run queries directly from the dashboard |
 
@@ -99,7 +99,7 @@ Every HA cluster includes the following at no additional cost:
 | Limit | Value |
 |-------|-------|
 | Databases per account | 2 |
-| Storage per database | 4 GB |
+| Storage per database | 2 GB |
 | Connections per database | 5 |
 | Backups | Not included |
 | High availability | Not included |

@@ -7,17 +7,11 @@ description: "Store and query vector embeddings for AI applications"
 
 Every Rivestack database comes with [pgvector](https://github.com/pgvector/pgvector) pre-installed. pgvector adds vector similarity search to PostgreSQL, letting you store embeddings from OpenAI, Cohere, Hugging Face, or any other model alongside your relational data.
 
-<Info>pgvector is enabled by default on all Rivestack databases — no installation or configuration needed.</Info>
+<Info>pgvector is pre-installed on all Rivestack databases. Add it to your database from the dashboard UI.</Info>
 
 ## Enable the extension
 
-pgvector is pre-installed, but you need to enable it in your database:
-
-```sql
-CREATE EXTENSION IF NOT EXISTS vector;
-```
-
-Verify it's active:
+Add pgvector to your database from the dashboard, then verify it's active:
 
 ```sql
 SELECT extname, extversion FROM pg_extension WHERE extname = 'vector';
