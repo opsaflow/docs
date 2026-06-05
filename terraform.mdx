@@ -43,6 +43,50 @@ Get your API key from the [Rivestack Dashboard](https://app.rivestack.io). API k
   </Tab>
 </Tabs>
 
+## Node capacity
+
+HA clusters run on **prepaid node capacity**, not per-cluster billing. You buy a pool of nodes once, then Terraform (or the API) provisions clusters that draw from it — there's no checkout in your `terraform apply` loop.
+
+<Steps>
+  <Step title="Buy capacity in the dashboard">
+    In the [Rivestack Dashboard](https://app.rivestack.io), go to **Billing → Subscribe to Nodes**, choose a server type (`starter`, `growth`, or `scale`) and a quantity, then complete checkout. This is the only step that involves payment.
+  </Step>
+  <Step title="Provision against the pool">
+    `terraform apply` draws nodes from your pool automatically, matching on `server_type`. A `growth` cluster with `node_count = 2` consumes two `growth` nodes from your `growth` pool. There is no extra charge per cluster.
+  </Step>
+</Steps>
+
+<Warning>
+  If your pool has no free nodes of the requested `server_type`, the API returns **402 Payment Required** (`no available nodes; subscribe to nodes from the billing page first`) and `terraform apply` fails. Buy more capacity of that server type, then re-run.
+</Warning>
+
+### Provision with the REST API
+
+If you don't use Terraform, call the same endpoint directly. Create an API key, buy capacity, then:
+
+```bash
+# Provision a cluster from your prepaid pool (draws a matching node automatically)
+curl -X POST https://api.rivestack.io/api/ha/provision \
+  -H "Authorization: Bearer rsk_your_api_key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "production-cluster",
+    "region": "eu-central",
+    "server_type": "growth",
+    "node_count": 2,
+    "postgresql_version": 18
+  }'
+# → { "id": 42, "tenant_id": "rs-…", "status": "provisioning", … }
+
+# Poll until status is "active"
+curl https://api.rivestack.io/api/ha/42 \
+  -H "Authorization: Bearer rsk_your_api_key"
+```
+
+<Info>
+  Omit `server_type` to default to `starter`. The cluster is matched to a pool of the same server type and capacity is found automatically — no pool ID needed.
+</Info>
+
 ## Quick start
 
 This example creates a 2-node HA cluster with a database and user:
