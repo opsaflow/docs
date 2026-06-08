@@ -5,17 +5,20 @@ description: "Connection limits, storage, and resource quotas"
 
 ## Plan limits
 
-| Resource | Free | HA Cluster |
-|----------|------|------------|
-| **Databases per account** | 1 | Unlimited |
-| **Connections per database** | 5 | 100 |
-| **Storage** | 2 GB per database | Depends on server type |
-| **Nodes** | Shared | 1–3 dedicated |
-| **Backups** | Not included | Daily, 14-day retention |
-| **Point-in-time recovery** | Not included | Included |
-| **Monitoring** | Basic | Full metrics |
-| **SQL Editor** | Not included | Included |
-| **Extensions** | pgvector only | 5 pre-installed extensions |
+| Resource | Free | Solo | HA Cluster |
+|----------|------|------|------------|
+| **Price** | $0 | $15/mo | From $35/node/mo |
+| **Databases** | 1 | Multiple (storage permitting) | Unlimited |
+| **Connections per database** | 5 | 100 | 100 |
+| **Storage** | 2 GB per database | 55 GB | Depends on server type |
+| **Nodes** | Shared | 1 dedicated | 1–3 dedicated |
+| **Automatic failover** | No | No (single node) | Yes |
+| **Backups** | Not included | Daily, 7-day retention | Daily, 14-day retention |
+| **Point-in-time recovery** | Not included | Included | Included |
+| **Monitoring** | Basic | Full metrics | Full metrics |
+| **SQL Editor** | Included | Included | Included |
+| **Extensions** | pgvector only | 5 pre-installed extensions | 5 pre-installed extensions |
+| **Inactivity deletion** | After 30 days | Never | Never |
 
 ## Storage per server type
 
@@ -32,6 +35,7 @@ description: "Connection limits, storage, and resource quotas"
 | Tier | Max connections | Recommendation |
 |------|----------------|----------------|
 | **Free** | 5 | Development and testing only |
+| **Solo** | 100 | Small production apps on a dedicated VM |
 | **HA Cluster** | 100 | Use connection pooling for high-concurrency apps |
 
 ### Connection pooling

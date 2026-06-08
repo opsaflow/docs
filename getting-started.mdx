@@ -5,16 +5,21 @@ description: "Create your first managed PostgreSQL cluster on Rivestack"
 
 ## Overview
 
-Rivestack is a managed PostgreSQL service that gives you production-ready databases in minutes. Choose between a **free shared tier** for development or a **dedicated HA cluster** for production workloads.
+Rivestack is a managed PostgreSQL service that gives you production-ready databases in minutes. Start on the **free shared tier**, move to a **dedicated Solo VM** when you go to production, and step up to an **HA cluster** when you need automatic failover.
 
-<CardGroup cols={2}>
-  <Card title="Free Tier" icon="cube">
+<CardGroup cols={3}>
+  <Card title="Free" icon="cube">
     Shared PostgreSQL for development and testing. 2 GB storage, up to 5 connections. No credit card required.
   </Card>
-  <Card title="HA Cluster" icon="server">
+  <Card title="Solo" icon="server">
+    Your own dedicated VM with daily backups, point-in-time recovery, and monitoring. $15/month — never deleted.
+  </Card>
+  <Card title="HA Cluster" icon="shield-halved">
     Dedicated infrastructure with automatic failover, backups, and monitoring. Starting at $35/node/month.
   </Card>
 </CardGroup>
+
+<Tip>Already have a free database? You can [upgrade it to Solo](/pricing#upgrading-from-free) in one click — we migrate your data across automatically.</Tip>
 
 ## Create your first cluster
 
@@ -33,6 +38,15 @@ Create your Rivestack account at [app.rivestack.io](https://app.rivestack.io). Y
     5. Click **Create**.
 
     Your database is ready immediately. You'll see it on your dashboard with connection details.
+  </Tab>
+  <Tab title="Solo">
+    1. From the dashboard, click **Create Database** (or **Upgrade** on an existing free database).
+    2. Enter a **name**.
+    3. Select **Solo** as the plan.
+    4. Choose your **region** (EU or US).
+    5. Review the cost ($15/month) and complete checkout.
+
+    Your dedicated VM provisions in ~3 minutes. If you upgraded a free database, we migrate its data across automatically — the free database stays online until you delete it.
   </Tab>
   <Tab title="HA Cluster">
     1. From the dashboard, click **Create Database**.
@@ -91,7 +105,7 @@ postgresql://username:password@rs-abc12345.eu-central.db.rivestack.io:5432/mydb?
     All connections are encrypted with TLS. No unencrypted connections are allowed.
   </Card>
   <Card title="Automated Backups" icon="clock-rotate-left">
-    HA clusters include daily automated backups with point-in-time recovery.
+    Solo and HA clusters include daily automated backups with point-in-time recovery.
   </Card>
 </Columns>
 

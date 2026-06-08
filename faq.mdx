@@ -4,6 +4,16 @@ description: "Frequently asked questions about Rivestack"
 ---
 
 <AccordionGroup>
+  <Accordion title="What's the difference between Free, Solo, and HA?">
+    - **Free ($0)** — a shared PostgreSQL database for development and testing: 2 GB storage, 5 connections, no backups, deleted after 30 days of inactivity.
+    - **Solo ($15/mo)** — your own dedicated VM (2 vCPU · 4 GB RAM · 55 GB NVMe) with daily backups, point-in-time recovery, and monitoring. Single node, so no automatic failover, but never deleted. Ideal for small production apps.
+    - **HA Cluster (from $35/node/mo)** — dedicated infrastructure with 1–3 nodes and automatic failover for production workloads that need zero-downtime resilience.
+  </Accordion>
+
+  <Accordion title="How do I upgrade from Free to Solo?">
+    Open the free database in your dashboard and click **Upgrade**. We provision your dedicated Solo VM and **migrate your data across automatically** (typically ~3 minutes). Your free database stays online and untouched until you delete it, so you can verify everything first, then just point your app at the new host and credentials.
+  </Accordion>
+
   <Accordion title="What PostgreSQL version does Rivestack use?">
     Rivestack supports **PostgreSQL 16, 17, and 18**. You choose your major version when creating a cluster.
   </Accordion>
@@ -30,11 +40,11 @@ description: "Frequently asked questions about Rivestack"
   </Accordion>
 
   <Accordion title="How do backups work?">
-    HA clusters include automated daily backups via pgBackRest, stored in S3-compatible object storage. Backups are retained for 14 days. You can also trigger manual backups and restore to any point in time within the retention window. See the [Backups & Restore](/backups) guide for details.
+    Solo and HA clusters include automated daily backups via pgBackRest, stored in S3-compatible object storage. Retention is 7 days on Solo and 14 days on HA clusters. You can also trigger manual backups and restore to any point in time within the retention window. Free tier databases are not backed up. See the [Backups & Restore](/backups) guide for details.
   </Accordion>
 
   <Accordion title="Can I restore to a specific point in time?">
-    Yes. Rivestack supports point-in-time recovery (PITR) on HA clusters. Continuous WAL archiving lets you restore to any second within your backup retention window. Initiate a restore from the Backup tab in the dashboard.
+    Yes. Rivestack supports point-in-time recovery (PITR) on Solo and HA clusters. Continuous WAL archiving lets you restore to any second within your backup retention window. Initiate a restore from the Backup tab in the dashboard.
   </Accordion>
 
   <Accordion title="What regions are available?">
@@ -52,13 +62,14 @@ description: "Frequently asked questions about Rivestack"
 
   <Accordion title="What are the connection limits?">
     - **Free tier**: 5 connections per database
+    - **Solo**: 100 connections
     - **HA clusters**: 100 connections per cluster
 
     Use connection pooling in your application if you need more concurrent connections.
   </Accordion>
 
   <Accordion title="How is billing handled?">
-    HA clusters are billed monthly per node. Payment is processed via credit card through our payment provider. Scaling changes (adding/removing nodes) are prorated within your billing cycle. You can cancel anytime from the Billing page.
+    Solo is a flat $15/month. HA clusters are billed monthly per node (from $35/node). Payment is processed via credit card through our payment provider. Scaling changes (adding/removing nodes) are prorated within your billing cycle. You can cancel anytime from the Billing page.
   </Accordion>
 
   <Accordion title="Can I cancel my subscription?">

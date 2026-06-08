@@ -7,6 +7,8 @@ description: "How automatic failover keeps your database online"
 
 Rivestack HA clusters use [Patroni](https://github.com/patroni/patroni) for automatic failover and cluster management. When a primary node fails, a replica is promoted within seconds — no manual intervention required.
 
+<Info>Automatic failover requires an HA cluster (2+ nodes). The [Free](/pricing) and [Solo](/pricing) plans run a single node and do not include failover. Solo is a good fit when you want dedicated, backed-up PostgreSQL but don't yet need multi-node resilience.</Info>
+
 ## Architecture
 
 Each HA cluster consists of:

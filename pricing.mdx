@@ -18,6 +18,7 @@ description: "Plans, regions, and what's included"
     - pgvector on default database
     - SSL encryption
     - All regions
+    - Deleted after 30 days of inactivity
   </Card>
   <Card title="Solo" icon="database">
     **$15/month**
@@ -27,10 +28,10 @@ description: "Plans, regions, and what's included"
     - 2 vCPU · 4 GB RAM (EU Central)
     - 55 GB NVMe storage available
     - Dedicated — no neighbours
-    - pgvector enabled
+    - Up to 100 connections
     - Daily backups (7-day retention)
     - SSL encryption
-    - EU Central and US East
+    - Never deleted for inactivity
   </Card>
   <Card title="HA Cluster" icon="server">
     **Starting at $35/node/month**
@@ -44,7 +45,6 @@ description: "Plans, regions, and what's included"
     - Point-in-time recovery
     - Real-time monitoring
     - pgvector + 4 extensions
-    - SSL encryption
     - Email notifications
     - All regions
   </Card>
@@ -78,6 +78,10 @@ The VM type differs by region at the same $15/month price:
 | **Email notifications** | Provisioning and health alerts |
 
 > **Note**: Solo does not include high availability, automatic failover, or a load balancer. DNS points directly to the VM's public IP. For production workloads that require HA, use a Starter or higher HA cluster.
+
+## Upgrading from Free
+
+Already on the Free tier? You can upgrade a free database to **Solo** in one click from the dashboard. We provision your dedicated VM and **migrate your data across automatically** (typically ~3 minutes) — your free database stays online and untouched until you delete it, so you can verify everything first.
 
 ## HA cluster server types
 
