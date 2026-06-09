@@ -179,16 +179,17 @@ context = "\n".join([row[0] for row in results])
 
 ## Benchmarks
 
-Rivestack pgvector performance on a **Growth** server (4 vCPU, 8 GB RAM) with 1M vectors (1536 dimensions, HNSW index):
+Rivestack pgvector performance on one **Starter** node (2 vCPU, 4 GB RAM, local NVMe) with 250,000 vectors (1536 dimensions, HNSW `m=16` / `ef_construction=64`, cosine), measured from a same-region app over PgBouncer (`:6432`) and TLS:
 
 | Metric | Result |
 |--------|--------|
-| **Queries per second** | 2,000 QPS |
-| **p50 latency** | &lt;4ms |
-| **p99 latency** | &lt;12ms |
-| **Recall @ ef_search=100** | 99.1% |
+| **Throughput** | ~1,000 QPS at recall@10 0.93 |
+| **p50 latency** | 3.7 ms (4 clients) |
+| **Scales to** | ~1,570 QPS at p50 10 ms (16 clients) |
+| **Throughput ceiling** | ~1,980 QPS at recall@10 0.75 (ef_search=10, 16 clients, p50 8 ms) |
+| **Network floor** | 0.38 ms per same-region round-trip |
 
-<Info>Benchmarks ran with 10 concurrent clients performing cosine similarity searches against 1M OpenAI ada-002 embeddings using HNSW (`m=16`, `ef_construction=200`).</Info>
+<Info>QPS and p50 latency trade off across the concurrency curve — they are not simultaneous best-cases, so each figure carries its recall and client count. recall@10 0.93 uses `ef_search=80`; recall@10 0.75 uses `ef_search=10`. Pooling and TLS add only ~0.4 ms over the raw same-region network floor. A 1M × 1536 index is ~6 GB and does not fit or build on a 4 GB node — use a Growth or Scale node for datasets that large. Full methodology and reproduce-it steps: [pgvector NVMe vs cloud SSD benchmarks](https://rivestack.io/blog/pgvector-performance-nvme-vs-cloud-ssd-benchmarks).</Info>
 
 ## Performance tips
 
