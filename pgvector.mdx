@@ -112,11 +112,24 @@ HNSW provides fast, approximate nearest-neighbor search with good recall. Tuning
 | `m` | 16 | Max connections per node. Higher = better recall, more memory. |
 | `ef_construction` | 64 | Build-time search width. Higher = better recall, slower builds. |
 
-Set the search parameter at query time:
+Set the search parameter at query time. Higher `ef_search` means better recall and higher latency (the default is `40`):
 
 ```sql
-SET hnsw.ef_search = 100;  -- default is 40
+-- Per query — works on every port, including the pooled :6432 (see warning):
+BEGIN;
+SET LOCAL hnsw.ef_search = 100;
+SELECT id FROM documents ORDER BY embedding <=> $1 LIMIT 10;
+COMMIT;
+
+-- Or set a persistent default for the whole database (applies to new connections):
+ALTER DATABASE appdb SET hnsw.ef_search = 100;
 ```
+
+<Warning>
+  **On Solo, a plain session `SET hnsw.ef_search` is silently ignored.** Solo databases connect through PgBouncer in **transaction-pooling** mode on port `6432`, so a bare `SET hnsw.ef_search = 100;` runs in its own transaction and is reset before your next query — you'll quietly get the default (`40`) instead. Always either use `SET LOCAL` *inside the same transaction* as the query, or set a persistent default with `ALTER DATABASE appdb SET hnsw.ef_search = …` (or `ALTER ROLE appdb SET …`).
+
+  HA, Growth, and Scale databases use the load balancer on port `5432` (not transaction pooling), so a session-level `SET` does persist there — but `SET LOCAL` / `ALTER DATABASE` is the portable approach that works everywhere.
+</Warning>
 
 ### IVFFlat index
 
@@ -205,6 +218,6 @@ Measured across tiers (1536-dim, HNSW `m=16` / `ef_construction=64`, recall@10 v
 
 - **Always create an index** for tables over a few thousand rows. Without an index, pgvector scans every row.
 - **Use HNSW** as your default index type. It offers the best recall/speed trade-off.
-- **Increase `ef_search`** if recall is too low. Start with 100 and increase as needed.
+- **Increase `ef_search`** if recall is too low. Start with 100 and increase as needed — but on Solo's pooled `:6432` port, set it with `SET LOCAL` inside the query's transaction or via `ALTER DATABASE … SET` (a plain session `SET` is dropped by transaction pooling). The same applies to `ivfflat.probes`.
 - **Batch inserts** for loading large datasets. Use `COPY` or multi-row `INSERT` for best throughput.
 - **Choose the right distance operator** for your use case. Cosine (`<=>`) is the most common for text embeddings.
