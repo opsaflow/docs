@@ -81,7 +81,7 @@ description: "Frequently asked questions about Rivestack"
   </Accordion>
 
   <Accordion title="Do you support read replicas?">
-    HA clusters with 2 or more nodes include replicas for automatic failover. Replicas are managed automatically — all connections go through port `5432` and the load balancer handles routing transparently.
+    Not as read-serving replicas yet. HA clusters with 2 or more nodes run streaming-replication standbys for **automatic failover** — all connections go through port `5432`, and the load balancer routes every query (reads included) to the primary. A separate read-only replica endpoint that lets you offload reads is on our roadmap.
   </Accordion>
 
   <Accordion title="Is there a free trial for HA clusters?">
