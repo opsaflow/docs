@@ -189,7 +189,17 @@ Rivestack pgvector performance on one **Starter** node (2 vCPU, 4 GB RAM, local 
 | **Throughput ceiling** | ~1,980 QPS at recall@10 0.75 (ef_search=10, 16 clients, p50 8 ms) |
 | **Network floor** | 0.38 ms per same-region round-trip |
 
-<Info>QPS and p50 latency trade off across the concurrency curve — they are not simultaneous best-cases, so each figure carries its recall and client count. recall@10 0.93 uses `ef_search=80`; recall@10 0.75 uses `ef_search=10`. Pooling and TLS add only ~0.4 ms over the raw same-region network floor. A 1M × 1536 index is ~6 GB and does not fit or build on a 4 GB node — use a Growth or Scale node for datasets that large. Full methodology and reproduce-it steps: [pgvector NVMe vs cloud SSD benchmarks](https://rivestack.io/blog/pgvector-performance-nvme-vs-cloud-ssd-benchmarks).</Info>
+### Per-tier capacity and throughput
+
+Measured across tiers (1536-dim, HNSW `m=16` / `ef_construction=64`, recall@10 vs exact KNN). Each tier's honest fast-search capacity is sized so the index fits hot in RAM:
+
+| Tier | RAM | Hot capacity | Throughput (recall@10) |
+|------|-----|--------------|------------------------|
+| **Solo / Starter** | 4 GB | ~300K | ~1,000 QPS at 0.93, p50 3.7 ms (4 clients) |
+| **Growth** | 8 GB | ~600K | ~1,716 QPS at 0.93 (16 clients) |
+| **Scale** | 16 GB | ~1M | builds + serves 1M × 1536 at ~2,500 QPS, p50 ~6 ms (16 clients) |
+
+<Info>QPS and p50 latency trade off across the concurrency curve — they are not simultaneous best-cases, so each figure carries its recall and client count. recall@10 0.93 uses `ef_search=80`; recall@10 0.75 uses `ef_search=10`. Pooling and TLS add only ~0.4 ms over the raw same-region network floor (~0.38 ms on Solo via the `:6432` PgBouncer; ~0.91 ms on Growth/Scale via the `:5432` load balancer). A 1M × 1536 index is ~6 GB and does not fit or build on a 4 GB node — use a Scale (16 GB) node for datasets that large, where 1M × 1536 builds in ~30 min and serves ~2,500 QPS at p50 ~6 ms. Full methodology and reproduce-it steps: [pgvector NVMe vs cloud SSD benchmarks](https://rivestack.io/blog/pgvector-performance-nvme-vs-cloud-ssd-benchmarks).</Info>
 
 ## Performance tips
 
