@@ -1,0 +1,34 @@
+---
+title: "Changelog"
+description: "New features and improvements to Rivestack"
+---
+
+## June 2026
+
+### Solo plan — dedicated Postgres from $15/month
+
+A new tier between the free shared tier and HA clusters: a **dedicated
+single-VM PostgreSQL** instance with no shared neighbours and no HA overhead.
+
+- 2 vCPU · 4 GB RAM, 55 GB NVMe storage (EU)
+- Dedicated resources — no noisy neighbours
+- `pgvector` enabled
+- Daily backups with 7-day point-in-time recovery
+- SSL enforced
+
+First month is free, applied at checkout. See [Pricing](/pricing) for the full
+plan comparison.
+
+### Table Editor — browse and edit your data like a spreadsheet
+
+A new **Table Editor** in the dashboard lets you work with your tables visually,
+without writing SQL:
+
+- Browse tables with row-count and size estimates
+- View paginated, sortable rows in a spreadsheet-style grid
+- Edit cells inline, insert rows, and delete rows
+- Works on both Solo/shared databases and HA clusters
+
+Pagination uses the keyset ("seek") method where a primary key is available, so
+paging stays fast even on large tables. Tables without a primary key open in
+read-only mode to keep edits safe.
