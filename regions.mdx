@@ -11,9 +11,11 @@ Rivestack databases can be deployed in the following regions:
 |--------|----------|------------|------|------|-----|
 | **EU Central** | Falkenstein, Germany | `eu-central` | Yes | Yes | Yes |
 | **US East** | Virginia, USA | `us-east` | Yes | Yes | Yes |
-| **Asia Pacific** | Singapore | `ap` | Yes | Yes | Yes |
+| **Asia Pacific** | Singapore | `ap` | Yes | Yes | No |
 
-<Info>All regions include the same features. Pricing varies by region — EU Central is the cheapest. See [Pricing](/pricing#per-region-pricing) for details.</Info>
+<Info>Pricing varies by region — EU Central is the cheapest. See [Pricing](/pricing#per-region-pricing) for details.</Info>
+
+<Note>Singapore (Asia Pacific, `ap`) offers the **Solo** plan only. The HA tiers (Starter/Growth/Scale) are available in EU-Central and US-East.</Note>
 
 ## Choosing a region
 
@@ -43,6 +45,7 @@ Select the region closest to your application servers for the lowest latency. On
 
 - **Data residency**: All data stored within Singapore
 - **Hostname pattern**: `rs-{id}.ap.db.rivestack.io`
+- **Plan availability**: Solo only — the HA tiers (Starter/Growth/Scale) are available in EU-Central and US-East.
 
 ## Cross-region considerations
 

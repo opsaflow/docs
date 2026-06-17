@@ -47,20 +47,22 @@ description: "Plans, regions, and what's included"
     - Real-time monitoring
     - pgvector + 4 extensions
     - Email notifications
-    - All regions
+    - EU Central & US East (not Singapore)
   </Card>
 </CardGroup>
 
 ## Per-region pricing
 
-Pricing is set **per region** (USD/month). For HA tiers (Starter, Growth, Scale) the price is **per node**; Solo is a single node. **EU Central is the cheapest region**, US East is the most expensive, and Singapore sits in between.
+Pricing is set **per region** (USD/month). For HA tiers (Starter, Growth, Scale) the price is **per node**; Solo is a single node. **EU Central is the cheapest region** and US East is the most expensive. The HA tiers are offered in EU Central and US East; Singapore offers the Solo plan only.
 
 | Plan    | EU Central | US East | Asia Pacific (Singapore) |
 |---------|------------|---------|--------------------------|
 | Solo    | $15        | $29     | $25                      |
-| Starter | $35/node   | $59/node | $45/node                |
-| Growth  | $59/node   | $119/node | $85/node               |
-| Scale   | $99/node   | $229/node | $169/node              |
+| Starter | $35/node   | $59/node | —                       |
+| Growth  | $59/node   | $119/node | —                      |
+| Scale   | $99/node   | $229/node | —                      |
+
+<Note>Singapore offers the Solo plan only; the HA tiers (Starter/Growth/Scale) are available in EU-Central and US-East.</Note>
 
 <Info>The Free tier is $0 in every region. EU Central keeps its existing prices; US East and Singapore are priced higher to reflect regional infrastructure costs.</Info>
 
@@ -111,13 +113,13 @@ HA clusters are available in three server configurations:
 | **Available storage** | 55 GB | 135 GB | 295 GB |
 | **Price (EU Central)** | $35/node/mo | $59/node/mo | $99/node/mo |
 
-Prices shown are for EU Central, the cheapest region. US East and Singapore are higher — see [Per-region pricing](#per-region-pricing). EU runs on Hetzner's Intel CX line; US East and Singapore run on AMD CPX.
+Prices shown are for EU Central, the cheapest region. US East is higher — see [Per-region pricing](#per-region-pricing). EU runs on Hetzner's Intel CX line; US East runs on AMD CPX. HA clusters are available in EU Central and US East only; Singapore offers the Solo plan only.
 
 Storage listed is fully available for your PostgreSQL database. An additional 25 GB is reserved for the OS on each node.
 
 ### Example pricing
 
-Examples below use **EU Central** rates (the cheapest region). For US East or Singapore, substitute the per-node prices from the [Per-region pricing](#per-region-pricing) table.
+Examples below use **EU Central** rates (the cheapest region). For US East, substitute the per-node prices from the [Per-region pricing](#per-region-pricing) table. (HA clusters are not available in Singapore.)
 
 | Configuration | Monthly cost (EU Central) |
 |---------------|---------------------------|
@@ -133,9 +135,9 @@ Examples below use **EU Central** rates (the cheapest region). For US East or Si
 |--------|----------|------|------|----|
 | EU Central | Falkenstein, Germany | Yes | Yes | Yes |
 | US East | Virginia, USA | Yes | Yes | Yes |
-| Asia Pacific | Singapore | Yes | Yes | Yes |
+| Asia Pacific | Singapore | Yes | Yes | No |
 
-All regions include the same features. Pricing varies by region — **EU Central is the cheapest** — see [Per-region pricing](#per-region-pricing). Solo hardware specs also vary by region; see the Solo section above.
+Pricing varies by region — **EU Central is the cheapest** — see [Per-region pricing](#per-region-pricing). Solo hardware specs also vary by region; see the Solo section above. **Singapore offers the Solo plan only; the HA tiers (Starter/Growth/Scale) are available in EU-Central and US-East.**
 
 ## What's included in HA clusters
 
