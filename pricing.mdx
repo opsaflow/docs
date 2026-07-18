@@ -26,7 +26,7 @@ description: "Plans, regions, and what's included"
     Dedicated single-node PostgreSQL. No shared resources, no HA overhead.
 
     - 2 vCPU · 4 GB RAM (EU Central)
-    - 55 GB NVMe storage available
+    - 30 GB NVMe storage available
     - Dedicated — no neighbours
     - Up to 100 connections
     - Daily backups (7-day retention)
@@ -74,15 +74,15 @@ Solo gives you a dedicated PostgreSQL instance on its own VM — no shared neigh
 
 The VM type and price differ by region (see [Per-region pricing](#per-region-pricing) for the full price table — EU Central is the cheapest):
 
-| Spec | EU Central (`cx33`) | US East (`cpx11`) | Asia Pacific (`cpx12`) |
+| Spec | EU Central (`cx23`) | US East (`cpx11`) | Asia Pacific (`cpx12`) |
 |------|---------------------|-------------------|------------------------|
-| CPU | 4 vCPU (Intel) | 2 vCPU (AMD) | 1 vCPU (AMD) |
-| RAM | 8 GB | 2 GB | 2 GB |
-| Total disk | 80 GB NVMe | 40 GB NVMe | 40 GB NVMe |
-| **Available for PostgreSQL** | **55 GB** | **30 GB** | **30 GB** |
+| CPU | 2 vCPU (Intel) | 2 vCPU (AMD) | 1 vCPU (AMD) |
+| RAM | 4 GB | 2 GB | 2 GB |
+| Total disk | 40 GB NVMe | 40 GB NVMe | 40 GB NVMe |
+| **Available for PostgreSQL** | **30 GB** | **30 GB** | **30 GB** |
 | Price | $15/mo | $29/mo | $25/mo |
 
-<Note>EU Central Solo runs on Hetzner's Intel **CX** line, so EU boxes meet or exceed the advertised specs. US East and Singapore run on AMD **CPX** instances. Singapore's Solo box is the smallest (1 vCPU / 2 GB / 40 GB).</Note>
+<Note>EU Central Solo runs on Hetzner's Intel **CX** line; US East and Singapore run on AMD **CPX** instances. Singapore's Solo box is the smallest (1 vCPU / 2 GB / 40 GB).</Note>
 
 ### What Solo includes
 
