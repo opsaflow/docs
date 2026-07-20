@@ -192,27 +192,28 @@ context = "\n".join([row[0] for row in results])
 
 ## Benchmarks
 
-Rivestack pgvector performance on one **Starter** node (2 vCPU, 4 GB RAM, local NVMe) with 250,000 vectors (1536 dimensions, HNSW `m=16` / `ef_construction=64`, cosine), measured from a same-region app over PgBouncer (`:6432`) and TLS:
+Rivestack pgvector performance on a **dedicated-vCPU** node (2 vCPU, 4 GB RAM, local NVMe) with 250,000 vectors (1536 dimensions, HNSW `m=16` / `ef_construction=64`, cosine), measured from a same-region client over PgBouncer (`:6432`) and TLS:
 
 | Metric | Result |
 |--------|--------|
-| **Throughput** | ~1,000 QPS at recall@10 0.93 |
-| **p50 latency** | 3.7 ms (4 clients) |
-| **Scales to** | ~1,570 QPS at p50 10 ms (16 clients) |
-| **Throughput ceiling** | ~1,980 QPS at recall@10 0.75 (ef_search=10, 16 clients, p50 8 ms) |
-| **Network floor** | 0.38 ms per same-region round-trip |
+| **Throughput** | ~1,460 QPS at recall@10 0.90 (4 clients) |
+| **p50 latency** | 2.6 ms (4 clients); ~1.5 ms single client |
+| **Scales to** | ~2,520 QPS at 16 clients |
+| **EU shared-vCPU (cx)** | ~525 QPS at the same recall — roughly one-third of dedicated |
+| **Network floor** | 0.34–0.51 ms per same-region round-trip |
 
 ### Per-tier capacity and throughput
 
-Measured across tiers (1536-dim, HNSW `m=16` / `ef_construction=64`, recall@10 vs exact KNN). Each tier's honest fast-search capacity is sized so the index fits hot in RAM:
+Measured on dedicated-vCPU nodes (1536-dim, HNSW `m=16` / `ef_construction=64`, recall@10 vs exact KNN). EU nodes run the cheaper shared-vCPU `cx` line and are lower. Each node's fast-search capacity is sized so the index fits hot in RAM:
 
-| Tier | RAM | Hot capacity | Throughput (recall@10) |
+| Node | RAM | Hot capacity | Throughput (recall@10 0.90, 16 clients) |
 |------|-----|--------------|------------------------|
-| **Solo / Starter** | 4 GB | ~300K | ~1,000 QPS at 0.93, p50 3.7 ms (4 clients) |
-| **Growth** | 8 GB | ~600K | ~1,716 QPS at 0.93 (16 clients) |
-| **Scale** | 16 GB | ~1M | builds + serves 1M × 1536 at ~2,500 QPS, p50 ~6 ms (16 clients) |
+| **2 vCPU** | 4 GB | ~300K | ~2,520 QPS |
+| **4 vCPU** | 8 GB | ~600K | ~2,720 QPS |
+| **8 vCPU** | 16 GB | ~1M | ~4,300 QPS |
+| **16 vCPU** | 32 GB | 1M hot | ~7,500 QPS; serves 1M × 1536 at ~6,450 QPS (recall 0.75) |
 
-<Info>QPS and p50 latency trade off across the concurrency curve — they are not simultaneous best-cases, so each figure carries its recall and client count. recall@10 0.93 uses `ef_search=80`; recall@10 0.75 uses `ef_search=10`. Pooling and TLS add only ~0.4 ms over the raw same-region network floor (~0.38 ms on Solo via the `:6432` PgBouncer; ~0.91 ms on Growth/Scale via the `:5432` load balancer). A 1M × 1536 index is ~6 GB and does not fit or build on a 4 GB node — use a Scale (16 GB) node for datasets that large, where 1M × 1536 builds in ~30 min and serves ~2,500 QPS at p50 ~6 ms. Full methodology and reproduce-it steps: [pgvector NVMe vs cloud SSD benchmarks](https://rivestack.io/blog/pgvector-performance-nvme-vs-cloud-ssd-benchmarks).</Info>
+<Info>QPS and p50 latency trade off across the concurrency curve — they are not simultaneous best-cases, so each figure carries its recall and client count. Numbers are on dedicated-vCPU nodes; EU shared-vCPU (`cx`) nodes run roughly one-third (Solo measured ~525 vs ~1,460 QPS). A 1M × 1536 index is ~6 GB and needs a 16 vCPU / 32 GB node to stay hot, where it builds in ~4.5 min and serves ~6,450 QPS at p50 2.3 ms. Every operating point and one-command reproduce steps: [measured pgvector benchmarks](https://rivestack.io/pgvector-benchmarks-measured).</Info>
 
 ## Performance tips
 
