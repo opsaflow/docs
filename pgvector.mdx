@@ -192,28 +192,18 @@ context = "\n".join([row[0] for row in results])
 
 ## Benchmarks
 
-Rivestack pgvector performance on a **dedicated-vCPU** node (2 vCPU, 4 GB RAM, local NVMe) with 250,000 vectors (1536 dimensions, HNSW `m=16` / `ef_construction=64`, cosine), measured from a same-region client over PgBouncer (`:6432`) and TLS:
+Measured pgvector performance across the tiers (AMD CPX, shared vCPU, local NVMe), 250,000 vectors at 1536 dimensions, HNSW `m=16` / `ef_construction=64`, cosine, from a same-region client over PgBouncer (`:6432`) and TLS, recall@10 vs exact KNN:
 
-| Metric | Result |
-|--------|--------|
-| **Throughput** | ~1,460 QPS at recall@10 0.90 (4 clients) |
-| **p50 latency** | 2.6 ms (4 clients); ~1.5 ms single client |
-| **Scales to** | ~2,520 QPS at 16 clients |
-| **EU shared-vCPU (cx)** | ~525 QPS at the same recall — roughly one-third of dedicated |
-| **Network floor** | 0.34–0.51 ms per same-region round-trip |
+| Tier | vCPU / RAM | Hot capacity | Throughput | Recall@10 |
+|------|-----------|--------------|------------|-----------|
+| **Solo** | 1 / 2 GB | ~250K | ~980 QPS (4 clients), p50 3.8 ms | 0.90 |
+| **Starter** | 2 / 4 GB | ~350K | ~1,600 QPS (16 clients) | 0.93 |
+| **Growth** | 4 / 8 GB | ~600K | ~2,950 QPS (16 clients) | 0.94 |
+| **Scale** | 8 / 16 GB | ~1M | ~4,465 QPS (16 clients) | 0.95 |
 
-### Per-tier capacity and throughput
+Scale also builds and serves a 1M × 1536 index (~6 GB) hot: ~3,600 QPS at recall@10 0.74, p50 4.2 ms, 16 clients (index builds in ~9 min).
 
-Measured on dedicated-vCPU nodes (1536-dim, HNSW `m=16` / `ef_construction=64`, recall@10 vs exact KNN). EU nodes run the cheaper shared-vCPU `cx` line and are lower. Each node's fast-search capacity is sized so the index fits hot in RAM:
-
-| Node | RAM | Hot capacity | Throughput (recall@10 0.90, 16 clients) |
-|------|-----|--------------|------------------------|
-| **2 vCPU** | 4 GB | ~300K | ~2,520 QPS |
-| **4 vCPU** | 8 GB | ~600K | ~2,720 QPS |
-| **8 vCPU** | 16 GB | ~1M | ~4,300 QPS |
-| **16 vCPU** | 32 GB | 1M hot | ~7,500 QPS; serves 1M × 1536 at ~6,450 QPS (recall 0.75) |
-
-<Info>QPS and p50 latency trade off across the concurrency curve — they are not simultaneous best-cases, so each figure carries its recall and client count. Numbers are on dedicated-vCPU nodes; EU shared-vCPU (`cx`) nodes run roughly one-third (Solo measured ~525 vs ~1,460 QPS). A 1M × 1536 index is ~6 GB and needs a 16 vCPU / 32 GB node to stay hot, where it builds in ~4.5 min and serves ~6,450 QPS at p50 2.3 ms. Every operating point and one-command reproduce steps: [measured pgvector benchmarks](https://rivestack.io/pgvector-benchmarks-measured).</Info>
+<Info>CPX is AMD EPYC shared vCPU (not CPU-isolated); the gain over the older Intel CX line is faster cores and far better availability. QPS and p50 latency trade off across the concurrency curve, so each figure carries its recall and client count. Same-region network floor is ~0.3–0.5 ms per round-trip. Every operating point, with one-command reproduce steps: [measured pgvector benchmarks](https://rivestack.io/pgvector-benchmarks-measured).</Info>
 
 ## Performance tips
 

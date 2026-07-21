@@ -3,15 +3,32 @@ title: "Changelog"
 description: "New features and improvements to Rivestack"
 ---
 
+## July 2026
+
+### Moved to the AMD CPX line, with updated pricing
+
+Every EU tier now runs on Hetzner's AMD CPX line (shared vCPU on AMD EPYC):
+faster cores and far better availability than the older Intel CX line. Pricing
+and Solo specs changed with the move:
+
+- **Solo** is now **$29/month** in every region, on a 1 vCPU / 2 GB / 30 GB box
+  (`cpx12`; US East's `cpx11` over-delivers at 2 vCPU).
+- **HA tiers** are **$49 Starter / $85 Growth / $159 Scale** per node in EU
+  Central (US East higher). vCPU, RAM, and storage per tier are unchanged.
+- Every customer database is a single-tenant VM. CPX is shared vCPU, not
+  CPU-isolated; the win over CX is faster cores and stock availability.
+
+See [Pricing](/pricing) for the full comparison.
+
 ## June 2026
 
 ### Solo plan — dedicated Postgres from $15/month
 
-A new tier between the free shared tier and HA clusters: a **dedicated
-single-VM PostgreSQL** instance with no shared neighbours and no HA overhead.
+A new tier between the free shared tier and HA clusters: a **single-tenant
+single-VM PostgreSQL** instance with no HA overhead.
 
-- 2 vCPU · 4 GB RAM, 55 GB NVMe storage (EU)
-- Dedicated resources — no noisy neighbours
+- 2 vCPU · 4 GB RAM, 55 GB NVMe storage (EU) at launch
+- Your own VM, not shared with other customers' databases
 - `pgvector` enabled
 - Daily backups with 7-day point-in-time recovery
 - SSL enforced
