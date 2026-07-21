@@ -12,14 +12,14 @@ Rivestack is a managed PostgreSQL service that gives you production-ready databa
     Shared PostgreSQL for development and testing. 2 GB storage, up to 5 connections. No credit card required.
   </Card>
   <Card title="Solo" icon="server">
-    Your own dedicated VM with daily backups, point-in-time recovery, and monitoring. $29/month — never deleted.
+    Your own dedicated VM with daily backups, point-in-time recovery, and monitoring. $29/month, never deleted.
   </Card>
   <Card title="HA Cluster" icon="shield-halved">
     Dedicated infrastructure with automatic failover, backups, and monitoring. Starting at $49/node/month.
   </Card>
 </CardGroup>
 
-<Tip>Already have a free database? You can [upgrade it to Solo](/pricing#upgrading-from-free) in one click — we migrate your data across automatically.</Tip>
+<Tip>Already have a free database? You can [upgrade it to Solo](/pricing#upgrading-from-free) in one click, and we migrate your data across automatically.</Tip>
 
 ## Create your first cluster
 
@@ -43,10 +43,10 @@ Create your Rivestack account at [app.rivestack.io](https://app.rivestack.io). Y
     1. From the dashboard, click **Create Database** (or **Upgrade** on an existing free database).
     2. Enter a **name**.
     3. Select **Solo** as the plan.
-    4. Choose your **region** (EU, US, or Singapore). Pricing varies by region — EU is cheapest. See [Pricing](/pricing#per-region-pricing).
+    4. Choose your **region** (EU, US, or Singapore). Pricing varies by region, and EU is cheapest. See [Pricing](/pricing#per-region-pricing).
     5. Review the cost (from $29/month) and complete checkout.
 
-    Your dedicated VM provisions in ~3 minutes. If you upgraded a free database, we migrate its data across automatically — the free database stays online until you delete it.
+    Your dedicated VM provisions in ~3 minutes. If you upgraded a free database, we migrate its data across automatically, and the free database stays online until you delete it.
   </Tab>
   <Tab title="HA Cluster">
     1. From the dashboard, click **Create Database**.
@@ -57,7 +57,7 @@ Create your Rivestack account at [app.rivestack.io](https://app.rivestack.io). Y
        - US East (Virginia)
 
        <Note>HA clusters are available in EU Central and US East only. Singapore (Asia Pacific) offers the Solo plan only.</Note>
-    5. Select a **server type** (prices shown are EU Central, the cheapest region — see [Per-region pricing](/pricing#per-region-pricing)):
+    5. Select a **server type** (prices shown are EU Central, the cheapest region, detailed under [Per-region pricing](/pricing#per-region-pricing)):
        | Type | vCPUs | RAM | Storage | Price (EU Central) |
        |------|-------|-----|---------|--------------------|
        | Starter | 2 | 4 GB | 55 GB | $49/node/mo |
@@ -77,12 +77,12 @@ Create your Rivestack account at [app.rivestack.io](https://app.rivestack.io). Y
 
 Once your database is ready, navigate to the **Connection** tab to find your credentials:
 
-- **Host** — Your unique endpoint (e.g., `rs-abc12345.eu-central.db.rivestack.io`)
-- **Port** — `5432`
-- **Database** — Your database name
-- **Username** — Your database user
-- **Password** — Generated on creation (copy it from the dashboard)
-- **SSL Mode** — `require` (always enforced)
+- **Host**: Your unique endpoint (e.g., `rs-abc12345.eu-central.db.rivestack.io`)
+- **Port**: `5432`
+- **Database**: Your database name
+- **Username**: Your database user
+- **Password**: Generated on creation (copy it from the dashboard)
+- **SSL Mode**: `require` (always enforced)
 
 Your connection string looks like this:
 

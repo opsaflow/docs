@@ -88,7 +88,7 @@ postgresql://username:password@host:5432/dbname?sslmode=require
 
 All Rivestack connections **require SSL**. Unencrypted connections are rejected. Set `sslmode=require` in your connection string or driver configuration.
 
-No CA certificate download is needed — Rivestack uses certificates signed by a trusted public CA.
+No CA certificate download is needed, because Rivestack uses certificates signed by a trusted public CA.
 
 ## Connect with psql
 
@@ -272,7 +272,7 @@ psql "postgresql://myuser:mypassword@rs-abc12345.eu-central.db.rivestack.io:5432
 
 For HA clusters, connections are routed through a load balancer that automatically directs traffic to the primary node.
 
-All connections use port `5432`. The load balancer handles failover automatically — your application reconnects to the new primary without changing connection details.
+All connections use port `5432`. The load balancer handles failover automatically, and your application reconnects to the new primary without changing connection details.
 
 ## Connection limits
 

@@ -15,7 +15,7 @@ All connections to Rivestack databases **require SSL/TLS**. Unencrypted connecti
 | TLS version | TLS 1.2+ |
 | Certificate | Signed by trusted public CA |
 
-No CA certificate download is needed — standard PostgreSQL clients trust the certificate automatically.
+No CA certificate download is needed, because standard PostgreSQL clients trust the certificate automatically.
 
 ```
 postgresql://user:pass@host:5432/mydb?sslmode=require

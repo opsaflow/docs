@@ -5,7 +5,7 @@ description: "How automatic failover keeps your database online"
 
 ## Overview
 
-Rivestack HA clusters use [Patroni](https://github.com/patroni/patroni) for automatic failover and cluster management. When a primary node fails, a replica is promoted within seconds — no manual intervention required.
+Rivestack HA clusters use [Patroni](https://github.com/patroni/patroni) for automatic failover and cluster management. When a primary node fails, a replica is promoted within seconds, with no manual intervention required.
 
 <Info>Automatic failover requires an HA cluster (2+ nodes). The [Free](/pricing) and [Solo](/pricing) plans run a single node and do not include failover. Solo is a good fit when you want dedicated, backed-up PostgreSQL but don't yet need multi-node resilience.</Info>
 
@@ -13,10 +13,10 @@ Rivestack HA clusters use [Patroni](https://github.com/patroni/patroni) for auto
 
 Each HA cluster consists of:
 
-- **1-3 PostgreSQL nodes** — one primary and zero or more replicas for failover
-- **2 load balancers** — route connections to the correct node with a floating VIP (Virtual IP)
-- **etcd** — distributed consensus store for leader election
-- **Patroni** — cluster manager that handles replication, failover, and health checks
+- **1-3 PostgreSQL nodes**: one primary and zero or more replicas for failover
+- **2 load balancers**: route connections to the correct node with a floating VIP (Virtual IP)
+- **etcd**: distributed consensus store for leader election
+- **Patroni**: cluster manager that handles replication, failover, and health checks
 
 ```
                     ┌──────────────┐
@@ -36,15 +36,15 @@ Each HA cluster consists of:
 
 ## How failover works
 
-1. **Detection** — Patroni continuously monitors the health of each PostgreSQL node. If the primary becomes unresponsive, Patroni detects the failure within seconds.
+1. **Detection**: Patroni continuously monitors the health of each PostgreSQL node. If the primary becomes unresponsive, Patroni detects the failure within seconds.
 
-2. **Leader election** — Patroni uses etcd to coordinate leader election. The healthiest replica with the least replication lag is selected as the new primary.
+2. **Leader election**: Patroni uses etcd to coordinate leader election. The healthiest replica with the least replication lag is selected as the new primary.
 
-3. **Promotion** — The selected replica is promoted to primary. It begins accepting writes immediately.
+3. **Promotion**: The selected replica is promoted to primary. It begins accepting writes immediately.
 
-4. **Routing** — The load balancer detects the topology change and routes new connections to the new primary. Existing connections to the old primary are terminated.
+4. **Routing**: The load balancer detects the topology change and routes new connections to the new primary. Existing connections to the old primary are terminated.
 
-5. **Recovery** — When the failed node comes back online, it automatically rejoins the cluster as a replica and begins streaming from the new primary.
+5. **Recovery**: When the failed node comes back online, it automatically rejoins the cluster as a replica and begins streaming from the new primary.
 
 ## Failover expectations
 
@@ -69,8 +69,8 @@ Rivestack uses PostgreSQL **streaming replication** to keep replicas in sync wit
 
 Monitor replication lag for each replica in the dashboard:
 
-- **Lag time** — How far behind the replica is (in seconds)
-- **Lag bytes** — Size of un-replayed WAL data
+- **Lag time**: How far behind the replica is (in seconds)
+- **Lag bytes**: Size of un-replayed WAL data
 
 Under normal conditions, replication lag is sub-second. High write throughput or network issues can temporarily increase lag.
 
@@ -83,7 +83,7 @@ Under normal conditions, replication lag is sub-second. High write throughput or
 
 ## Connection routing
 
-All connections go through port `5432`. The load balancer automatically routes traffic to the current primary and handles failover transparently — no configuration needed.
+All connections go through port `5432`. The load balancer automatically routes traffic to the current primary and handles failover transparently, with no configuration needed.
 
 ## Best practices
 

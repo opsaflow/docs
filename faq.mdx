@@ -5,9 +5,9 @@ description: "Frequently asked questions about Rivestack"
 
 <AccordionGroup>
   <Accordion title="What's the difference between Free, Solo, and HA?">
-    - **Free ($0)** — a shared PostgreSQL database for development and testing: 2 GB storage, 5 connections, no backups, deleted after 30 days of inactivity.
-    - **Solo ($29/mo)** — your own single-tenant VM (1 vCPU · 2 GB RAM · 30 GB NVMe) with daily backups, point-in-time recovery, and monitoring. Single node, so no automatic failover, but never deleted. Ideal for small production apps.
-    - **HA Cluster (from $49/node/mo)** — dedicated infrastructure with 1–3 nodes and automatic failover for production workloads that need zero-downtime resilience.
+    - **Free ($0)**: a shared PostgreSQL database for development and testing. 2 GB storage, 5 connections, no backups, deleted after 30 days of inactivity.
+    - **Solo ($29/mo)**: your own single-tenant VM (1 vCPU · 2 GB RAM · 30 GB NVMe) with daily backups, point-in-time recovery, and monitoring. Single node, so no automatic failover, but never deleted. Ideal for small production apps.
+    - **HA Cluster (from $49/node/mo)**: dedicated infrastructure with 1 to 3 nodes and automatic failover for production workloads that need zero-downtime resilience.
   </Accordion>
 
   <Accordion title="How do I upgrade from Free to Solo?">
@@ -20,11 +20,11 @@ description: "Frequently asked questions about Rivestack"
 
   <Accordion title="What extensions are available?">
     Rivestack includes the following pre-installed extensions:
-    - **pgvector** — Vector similarity search for AI/ML embeddings
-    - **uuid-ossp** — UUID generation
-    - **pg_stat_statements** — SQL execution statistics tracking
-    - **pgcrypto** — Cryptographic functions
-    - **pg_trgm** — Trigram matching for similarity searches
+    - **pgvector**: Vector similarity search for AI/ML embeddings
+    - **uuid-ossp**: UUID generation
+    - **pg_stat_statements**: SQL execution statistics tracking
+    - **pgcrypto**: Cryptographic functions
+    - **pg_trgm**: Trigram matching for similarity searches
 
     Extensions are managed through the dashboard UI. Navigate to your database and add extensions from there.
   </Accordion>
@@ -48,11 +48,11 @@ description: "Frequently asked questions about Rivestack"
   </Accordion>
 
   <Accordion title="What regions are available?">
-    - **EU Central** — Falkenstein, Germany
-    - **US East** — Virginia, USA
-    - **Asia Pacific** — Singapore (Solo plan only)
+    - **EU Central**: Falkenstein, Germany
+    - **US East**: Virginia, USA
+    - **Asia Pacific**: Singapore (Solo plan only)
 
-    Free and Solo are available in all regions. The HA tiers (Starter/Growth/Scale) are available in EU Central and US East only — Singapore offers the Solo plan only. Pricing is set per region — **EU Central is the cheapest** — see [Pricing](/pricing#per-region-pricing).
+    Free and Solo are available in all regions. The HA tiers (Starter/Growth/Scale) are available in EU Central and US East only, so Singapore offers the Solo plan only. Pricing is set per region, and **EU Central is the cheapest**. See [Pricing](/pricing#per-region-pricing).
   </Accordion>
 
   <Accordion title="Can I scale my cluster?">
@@ -82,7 +82,7 @@ description: "Frequently asked questions about Rivestack"
   </Accordion>
 
   <Accordion title="Do you support read replicas?">
-    Not as read-serving replicas yet. HA clusters with 2 or more nodes run streaming-replication standbys for **automatic failover** — all connections go through port `5432`, and the load balancer routes every query (reads included) to the primary. A separate read-only replica endpoint that lets you offload reads is on our roadmap.
+    Not as read-serving replicas yet. HA clusters with 2 or more nodes run streaming-replication standbys for **automatic failover**. All connections go through port `5432`, and the load balancer routes every query (reads included) to the primary. A separate read-only replica endpoint that lets you offload reads is on our roadmap.
   </Accordion>
 
   <Accordion title="Is there a free trial for HA clusters?">

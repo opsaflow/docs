@@ -115,7 +115,7 @@ HNSW provides fast, approximate nearest-neighbor search with good recall. Tuning
 Set the search parameter at query time. Higher `ef_search` means better recall and higher latency (the default is `40`):
 
 ```sql
--- Per query — works on every port, including the pooled :6432 (see warning):
+-- Per query, works on every port, including the pooled :6432 (see warning):
 BEGIN;
 SET LOCAL hnsw.ef_search = 100;
 SELECT id FROM documents ORDER BY embedding <=> $1 LIMIT 10;
@@ -126,9 +126,9 @@ ALTER DATABASE appdb SET hnsw.ef_search = 100;
 ```
 
 <Warning>
-  **On Solo, a plain session `SET hnsw.ef_search` is silently ignored.** Solo databases connect through PgBouncer in **transaction-pooling** mode on port `6432`, so a bare `SET hnsw.ef_search = 100;` runs in its own transaction and is reset before your next query — you'll quietly get the default (`40`) instead. Always either use `SET LOCAL` *inside the same transaction* as the query, or set a persistent default with `ALTER DATABASE appdb SET hnsw.ef_search = …` (or `ALTER ROLE appdb SET …`).
+  **On Solo, a plain session `SET hnsw.ef_search` is silently ignored.** Solo databases connect through PgBouncer in **transaction-pooling** mode on port `6432`, so a bare `SET hnsw.ef_search = 100;` runs in its own transaction and is reset before your next query, leaving you with the default (`40`) instead. Always either use `SET LOCAL` *inside the same transaction* as the query, or set a persistent default with `ALTER DATABASE appdb SET hnsw.ef_search = …` (or `ALTER ROLE appdb SET …`).
 
-  HA, Growth, and Scale databases use the load balancer on port `5432` (not transaction pooling), so a session-level `SET` does persist there — but `SET LOCAL` / `ALTER DATABASE` is the portable approach that works everywhere.
+  HA, Growth, and Scale databases use the load balancer on port `5432` (not transaction pooling), so a session-level `SET` does persist there, but `SET LOCAL` / `ALTER DATABASE` is the portable approach that works everywhere.
 </Warning>
 
 ### IVFFlat index
@@ -203,12 +203,12 @@ Measured pgvector performance across the tiers (AMD CPX, shared vCPU, local NVMe
 
 Scale also builds and serves a 1M × 1536 index (~6 GB) hot: ~3,600 QPS at recall@10 0.74, p50 4.2 ms, 16 clients (index builds in ~9 min).
 
-<Info>CPX is AMD EPYC shared vCPU (not CPU-isolated); the gain over the older Intel CX line is faster cores and far better availability. QPS and p50 latency trade off across the concurrency curve, so each figure carries its recall and client count. Same-region network floor is ~0.3–0.5 ms per round-trip. Every operating point, with one-command reproduce steps: [measured pgvector benchmarks](https://rivestack.io/pgvector-benchmarks-measured).</Info>
+<Info>CPX is AMD EPYC shared vCPU (not CPU-isolated); the gain over the older Intel CX line is faster cores and far better availability. QPS and p50 latency trade off across the concurrency curve, so each figure carries its recall and client count. Same-region network floor is ~0.3 to 0.5 ms per round-trip. Every operating point, with one-command reproduce steps: [measured pgvector benchmarks](https://rivestack.io/pgvector-benchmarks-measured).</Info>
 
 ## Performance tips
 
 - **Always create an index** for tables over a few thousand rows. Without an index, pgvector scans every row.
 - **Use HNSW** as your default index type. It offers the best recall/speed trade-off.
-- **Increase `ef_search`** if recall is too low. Start with 100 and increase as needed — but on Solo's pooled `:6432` port, set it with `SET LOCAL` inside the query's transaction or via `ALTER DATABASE … SET` (a plain session `SET` is dropped by transaction pooling). The same applies to `ivfflat.probes`.
+- **Increase `ef_search`** if recall is too low. Start with 100 and increase as needed, but on Solo's pooled `:6432` port, set it with `SET LOCAL` inside the query's transaction or via `ALTER DATABASE … SET` (a plain session `SET` is dropped by transaction pooling). The same applies to `ivfflat.probes`.
 - **Batch inserts** for loading large datasets. Use `COPY` or multi-row `INSERT` for best throughput.
 - **Choose the right distance operator** for your use case. Cosine (`<=>`) is the most common for text embeddings.

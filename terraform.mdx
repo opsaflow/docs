@@ -45,7 +45,7 @@ Get your API key from the [Rivestack Dashboard](https://app.rivestack.io). API k
 
 ## Node capacity
 
-HA clusters run on **prepaid node capacity**, not per-cluster billing. You buy a pool of nodes once, then Terraform (or the API) provisions clusters that draw from it — there's no checkout in your `terraform apply` loop.
+HA clusters run on **prepaid node capacity**, not per-cluster billing. You buy a pool of nodes once, then Terraform (or the API) provisions clusters that draw from it, so there's no checkout in your `terraform apply` loop.
 
 <Steps>
   <Step title="Buy capacity in the dashboard">
@@ -85,7 +85,7 @@ curl https://api.rivestack.io/api/ha/42 \
 ```
 
 <Info>
-  Omit `server_type` to default to `starter`. The cluster is matched to a pool of the same server type and capacity is found automatically — no pool ID needed.
+  Omit `server_type` to default to `starter`. The cluster is matched to a pool of the same server type and capacity is found automatically, with no pool ID needed.
 </Info>
 
 ## Quick start

@@ -72,7 +72,7 @@ Solo gives you a single-tenant PostgreSQL instance on its own VM at a fraction o
 
 ### Per-region hardware
 
-The VM type and price differ by region (see [Per-region pricing](#per-region-pricing) for the full price table — EU Central is the cheapest):
+The VM type and price differ by region (see [Per-region pricing](#per-region-pricing) for the full price table, where EU Central is the cheapest):
 
 | Spec | EU Central (`cpx12`) | US East (`cpx11`) | Asia Pacific (`cpx12`) |
 |------|----------------------|-------------------|------------------------|
@@ -82,7 +82,7 @@ The VM type and price differ by region (see [Per-region pricing](#per-region-pri
 | **Available for PostgreSQL** | **30 GB** | **30 GB** | **30 GB** |
 | Price | $29/mo | $29/mo | $29/mo |
 
-<Note>All regions run Solo on Hetzner's AMD **CPX** line (shared vCPU on AMD EPYC — faster and more reliably in stock than the older Intel CX line, not CPU-isolated). US East's `cpx11` over-delivers at 2 vCPU. Specs shown are the advertised minimums.</Note>
+<Note>All regions run Solo on Hetzner's AMD **CPX** line (shared vCPU on AMD EPYC, faster and more reliably in stock than the older Intel CX line, not CPU-isolated). US East's `cpx11` over-delivers at 2 vCPU. Specs shown are the advertised minimums.</Note>
 
 ### What Solo includes
 
@@ -100,7 +100,7 @@ The VM type and price differ by region (see [Per-region pricing](#per-region-pri
 
 ## Upgrading from Free
 
-Already on the Free tier? You can upgrade a free database to **Solo** in one click from the dashboard. We provision your dedicated VM and **migrate your data across automatically** (typically ~3 minutes) — your free database stays online and untouched until you delete it, so you can verify everything first.
+Already on the Free tier? You can upgrade a free database to **Solo** in one click from the dashboard. We provision your dedicated VM and **migrate your data across automatically** (typically ~3 minutes). Your free database stays online and untouched until you delete it, so you can verify everything first.
 
 ## HA cluster server types
 
@@ -113,7 +113,7 @@ HA clusters are available in three server configurations:
 | **Available storage** | 55 GB | 135 GB | 295 GB |
 | **Price (EU Central)** | $49/node/mo | $85/node/mo | $159/node/mo |
 
-Prices shown are for EU Central, the cheapest region. US East is higher — see [Per-region pricing](#per-region-pricing). All regions run on Hetzner's AMD CPX line (shared vCPU). HA clusters are available in EU Central and US East only; Singapore offers the Solo plan only. (US East Scale ships 215 GB available storage rather than 295 GB.)
+Prices shown are for EU Central, the cheapest region. US East is higher. See [Per-region pricing](#per-region-pricing). All regions run on Hetzner's AMD CPX line (shared vCPU). HA clusters are available in EU Central and US East only; Singapore offers the Solo plan only. (US East Scale ships 215 GB available storage rather than 295 GB.)
 
 Storage listed is fully available for your PostgreSQL database. An additional 25 GB is reserved for the OS on each node.
 
@@ -137,7 +137,7 @@ Examples below use **EU Central** rates (the cheapest region). For US East, subs
 | US East | Virginia, USA | Yes | Yes | Yes |
 | Asia Pacific | Singapore | Yes | Yes | No |
 
-Pricing varies by region — **EU Central is the cheapest** — see [Per-region pricing](#per-region-pricing). Solo hardware specs also vary by region; see the Solo section above. **Singapore offers the Solo plan only; the HA tiers (Starter/Growth/Scale) are available in EU-Central and US-East.**
+Pricing varies by region, and **EU Central is the cheapest**. See [Per-region pricing](#per-region-pricing). Solo hardware specs also vary by region; see the Solo section above. **Singapore offers the Solo plan only; the HA tiers (Starter/Growth/Scale) are available in EU-Central and US-East.**
 
 ## What's included in HA clusters
 
@@ -162,7 +162,7 @@ Every HA cluster includes the following at no additional cost:
 - **Payment**: Credit card via our payment provider.
 - **Billing cycle**: Monthly, starting from cluster/database creation.
 - **Region pricing**: Prices are set per region (EU Central cheapest, US East most expensive). See [Per-region pricing](#per-region-pricing).
-- **Solo**: $29/month (all regions) — a single node, no per-node scaling.
+- **Solo**: $29/month (all regions), a single node with no per-node scaling.
 - **HA clusters**: Adding or removing nodes updates your subscription immediately. Changes are prorated. The per-node rate depends on the cluster's region.
 - **Cancellation**: Cancel anytime from the Billing page. Your database remains active until the end of the current billing period.
 

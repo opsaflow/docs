@@ -5,7 +5,7 @@ description: "Scale your PostgreSQL cluster by adding or removing nodes"
 
 ## Overview
 
-Rivestack HA clusters let you add or remove nodes (1 to 3 per cluster) through the dashboard, handled by our automated provisioning system. Added nodes are streaming-replication standbys that provide **high availability and automatic failover** — they are not read-serving replicas, so all client traffic (reads included) is routed to the primary. To increase query performance or fit a larger working set, choose a larger server type (see [Server types](#server-types) below).
+Rivestack HA clusters let you add or remove nodes (1 to 3 per cluster) through the dashboard, handled by our automated provisioning system. Added nodes are streaming-replication standbys that provide **high availability and automatic failover**. They are not read-serving replicas, so all client traffic (reads included) is routed to the primary. To increase query performance or fit a larger working set, choose a larger server type (see [Server types](#server-types) below).
 
 <Info>On the **Solo** plan (a single dedicated node), failover isn't available. To add standby nodes and automatic failover, create an [HA cluster](/high-availability).</Info>
 
