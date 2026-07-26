@@ -1,0 +1,6 @@
+/* JetBrains Mono renders wide, so the default 16px root reads oversized.
+   Pull the whole rem scale down a notch — body, headings, and nav shrink
+   proportionally. */
+html {
+  font-size: 15px;
+}
