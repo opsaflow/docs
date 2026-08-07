@@ -63,7 +63,7 @@ response = openai.embeddings.create(
 embedding = response.data[0].embedding
 
 # Store in Rivestack
-conn = psycopg2.connect("postgresql://user:pass@host:5432/mydb?sslmode=require")
+conn = psycopg2.connect("postgresql://user:pass@host:6432/mydb?sslmode=require")
 cur = conn.cursor()
 cur.execute(
     "INSERT INTO documents (content, embedding) VALUES (%s, %s)",
@@ -115,7 +115,7 @@ HNSW provides fast, approximate nearest-neighbor search with good recall. Tuning
 Set the search parameter at query time. Higher `ef_search` means better recall and higher latency (the default is `40`):
 
 ```sql
--- Per query, works on every port, including the pooled :6432 (see warning):
+-- Per query, and the only form that survives transaction pooling (see warning):
 BEGIN;
 SET LOCAL hnsw.ef_search = 100;
 SELECT id FROM documents ORDER BY embedding <=> $1 LIMIT 10;
@@ -126,9 +126,9 @@ ALTER DATABASE appdb SET hnsw.ef_search = 100;
 ```
 
 <Warning>
-  **On Solo, a plain session `SET hnsw.ef_search` is silently ignored.** Solo databases connect through PgBouncer in **transaction-pooling** mode on port `6432`, so a bare `SET hnsw.ef_search = 100;` runs in its own transaction and is reset before your next query, leaving you with the default (`40`) instead. Always either use `SET LOCAL` *inside the same transaction* as the query, or set a persistent default with `ALTER DATABASE appdb SET hnsw.ef_search = …` (or `ALTER ROLE appdb SET …`).
+  **A plain session `SET hnsw.ef_search` is silently ignored.** Every plan connects through PgBouncer in **transaction-pooling** mode on port `6432`, so a bare `SET hnsw.ef_search = 100;` runs in its own transaction and is reset before your next query, leaving you with the default (`40`) instead. Always either use `SET LOCAL` *inside the same transaction* as the query, or set a persistent default with `ALTER DATABASE appdb SET hnsw.ef_search = …` (or `ALTER ROLE appdb SET …`).
 
-  HA, Growth, and Scale databases use the load balancer on port `5432` (not transaction pooling), so a session-level `SET` does persist there, but `SET LOCAL` / `ALTER DATABASE` is the portable approach that works everywhere.
+  This holds on HA clusters too. The load balancer forwards to PgBouncer rather than to PostgreSQL directly, so scaling up does not turn session-level `SET` back on.
 </Warning>
 
 ### IVFFlat index
@@ -172,7 +172,7 @@ def search(query: str, top_k: int = 5):
     query_embedding = response.data[0].embedding
 
     # 2. Search Rivestack for similar documents
-    conn = psycopg2.connect("postgresql://user:pass@host:5432/mydb?sslmode=require")
+    conn = psycopg2.connect("postgresql://user:pass@host:6432/mydb?sslmode=require")
     cur = conn.cursor()
     cur.execute("""
         SELECT content, embedding <=> %s::vector AS distance
@@ -209,6 +209,6 @@ Scale also builds and serves a 1M × 1536 index (~6 GB) hot: ~3,600 QPS at recal
 
 - **Always create an index** for tables over a few thousand rows. Without an index, pgvector scans every row.
 - **Use HNSW** as your default index type. It offers the best recall/speed trade-off.
-- **Increase `ef_search`** if recall is too low. Start with 100 and increase as needed, but on Solo's pooled `:6432` port, set it with `SET LOCAL` inside the query's transaction or via `ALTER DATABASE … SET` (a plain session `SET` is dropped by transaction pooling). The same applies to `ivfflat.probes`.
+- **Increase `ef_search`** if recall is too low. Start with 100 and increase as needed, but set it with `SET LOCAL` inside the query's transaction or via `ALTER DATABASE … SET` — every plan pools on `:6432`, and a plain session `SET` is dropped by transaction pooling. The same applies to `ivfflat.probes`.
 - **Batch inserts** for loading large datasets. Use `COPY` or multi-row `INSERT` for best throughput.
 - **Choose the right distance operator** for your use case. Cosine (`<=>`) is the most common for text embeddings.

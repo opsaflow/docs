@@ -50,7 +50,7 @@ For applications that need more than 100 concurrent connections, use a client-si
     connection_pool = pool.ThreadedConnectionPool(
         minconn=5,
         maxconn=20,
-        dsn="postgresql://user:pass@host:5432/mydb?sslmode=require"
+        dsn="postgresql://user:pass@host:6432/mydb?sslmode=require"
     )
 
     conn = connection_pool.getconn()
@@ -63,7 +63,7 @@ For applications that need more than 100 concurrent connections, use a client-si
     const { Pool } = require('pg');
 
     const pool = new Pool({
-      connectionString: 'postgresql://user:pass@host:5432/mydb?sslmode=require',
+      connectionString: 'postgresql://user:pass@host:6432/mydb?sslmode=require',
       max: 20,
       ssl: { rejectUnauthorized: false }
     });
@@ -75,7 +75,7 @@ For applications that need more than 100 concurrent connections, use a client-si
     ```go
     // pgx pool handles connection pooling automatically
     pool, err := pgxpool.New(context.Background(),
-        "postgresql://user:pass@host:5432/mydb?sslmode=require")
+        "postgresql://user:pass@host:6432/mydb?sslmode=require")
     if err != nil {
         log.Fatal(err)
     }

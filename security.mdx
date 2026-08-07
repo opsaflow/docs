@@ -18,7 +18,7 @@ All connections to Rivestack databases **require SSL/TLS**. Unencrypted connecti
 No CA certificate download is needed, because standard PostgreSQL clients trust the certificate automatically.
 
 ```
-postgresql://user:pass@host:5432/mydb?sslmode=require
+postgresql://user:pass@host:6432/mydb?sslmode=require
 ```
 
 ### At rest
@@ -37,7 +37,7 @@ Database nodes communicate over private networks. Only the load balancer endpoin
 
 | Port | Service | Access |
 |------|---------|--------|
-| 5432 | PostgreSQL | Via load balancer |
+| 6432 | PostgreSQL | Direct to PgBouncer, or via the load balancer on an HA cluster |
 
 ## Authentication
 

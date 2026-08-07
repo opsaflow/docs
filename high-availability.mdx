@@ -21,7 +21,7 @@ Each HA cluster consists of:
 ```
                     ┌──────────────┐
    Clients ────────►│Load Balancer │
-                    │  (VIP: 5432) │
+                    │  (VIP: 6432) │
                     └──────┬───────┘
                            │
               ┌────────────┼────────────┐
@@ -83,7 +83,7 @@ Under normal conditions, replication lag is sub-second. High write throughput or
 
 ## Connection routing
 
-All connections go through port `5432`. The load balancer automatically routes traffic to the current primary and handles failover transparently, with no configuration needed.
+All connections go through port `6432` — the same port a single-node cluster uses, so scaling to HA leaves your connection string untouched. The load balancer automatically routes traffic to the current primary and handles failover transparently, with no configuration needed.
 
 ## Best practices
 
