@@ -1,20 +1,23 @@
 ---
-title: "pgvector Setup"
-description: "Store and query vector embeddings for AI applications"
+title: "pgvector and pgvectorscale"
+description: "Store and query vector embeddings with pgvector and StreamingDiskANN"
 ---
 
 ## Overview
 
-pgvector adds vector similarity search to PostgreSQL, letting you store embeddings from OpenAI, Cohere, Hugging Face, or any other model alongside your relational data.
+pgvector adds vector similarity search to PostgreSQL, letting you store embeddings from OpenAI, Cohere, Hugging Face, or any other model alongside your relational data. pgvectorscale builds on pgvector with StreamingDiskANN indexes for larger, disk-oriented vector workloads.
 
-pgvector is enabled by default on the `appdb` database created with your cluster. For additional databases, add the pgvector extension through the dashboard UI or Terraform.
+Both extensions are enabled by default on new Rivestack databases. Their SQL extension names are `vector` and `vectorscale`.
 
 ## Verify the extension
 
-Confirm pgvector is active on your database:
+Confirm both extensions are active on your database:
 
 ```sql
-SELECT extname, extversion FROM pg_extension WHERE extname = 'vector';
+SELECT extname, extversion
+FROM pg_extension
+WHERE extname IN ('vector', 'vectorscale')
+ORDER BY extname;
 ```
 
 ## Store embeddings
@@ -63,7 +66,7 @@ response = openai.embeddings.create(
 embedding = response.data[0].embedding
 
 # Store in Rivestack
-conn = psycopg2.connect("postgresql://user:pass@host:6432/mydb?sslmode=require")
+conn = psycopg2.connect("postgresql://user:pass@host:6432/mydb?sslmode=verify-full")
 cur = conn.cursor()
 cur.execute(
     "INSERT INTO documents (content, embedding) VALUES (%s, %s)",
@@ -128,7 +131,7 @@ ALTER DATABASE appdb SET hnsw.ef_search = 100;
 <Warning>
   **A plain session `SET hnsw.ef_search` is silently ignored.** Every plan connects through PgBouncer in **transaction-pooling** mode on port `6432`, so a bare `SET hnsw.ef_search = 100;` runs in its own transaction and is reset before your next query, leaving you with the default (`40`) instead. Always either use `SET LOCAL` *inside the same transaction* as the query, or set a persistent default with `ALTER DATABASE appdb SET hnsw.ef_search = …` (or `ALTER ROLE appdb SET …`).
 
-  This holds on HA clusters too. The load balancer forwards to PgBouncer rather than to PostgreSQL directly, so scaling up does not turn session-level `SET` back on.
+  This holds on HA clusters too. The load balancer and source-filtering HAProxy gateway pass the TLS stream to PgBouncer rather than to PostgreSQL directly, so scaling up does not turn session-level `SET` back on.
 </Warning>
 
 ### IVFFlat index
@@ -145,15 +148,27 @@ IVFFlat requires a training step and works best when you set `lists` to `rows / 
 SET ivfflat.probes = 10;  -- default is 1, higher = better recall
 ```
 
+### StreamingDiskANN index (pgvectorscale)
+
+For datasets that should not keep the entire graph in memory, use pgvectorscale's StreamingDiskANN index:
+
+```sql
+CREATE INDEX documents_embedding_diskann_idx
+ON documents
+USING diskann (embedding vector_cosine_ops);
+```
+
+The table still uses pgvector's `VECTOR` type and distance operators; pgvectorscale supplies the `diskann` index access method. Test recall, build time, memory, and latency with your own embeddings before choosing an index for production.
+
 ### Which index to use?
 
-| | HNSW | IVFFlat |
-|-|------|---------|
-| Recall | Higher | Lower |
-| Build speed | Slower | Faster |
-| Query speed | Fast | Fast |
-| Memory | More | Less |
-| Recommendation | Default choice | Large datasets with limited memory |
+| | HNSW | IVFFlat | StreamingDiskANN |
+|-|------|---------|-------------------|
+| Recall | High | Tunable | Tunable |
+| Build speed | Slower | Faster | Workload dependent |
+| Query speed | Fast | Fast | Designed for scalable disk-oriented search |
+| Memory | More | Less | Lower in-memory graph pressure |
+| Recommendation | General default | Simple, trained approximate index | Benchmark for larger vector datasets |
 
 ## RAG example
 
@@ -172,7 +187,7 @@ def search(query: str, top_k: int = 5):
     query_embedding = response.data[0].embedding
 
     # 2. Search Rivestack for similar documents
-    conn = psycopg2.connect("postgresql://user:pass@host:6432/mydb?sslmode=require")
+    conn = psycopg2.connect("postgresql://user:pass@host:6432/mydb?sslmode=verify-full")
     cur = conn.cursor()
     cur.execute("""
         SELECT content, embedding <=> %s::vector AS distance
@@ -209,6 +224,7 @@ Scale also builds and serves a 1M × 1536 index (~6 GB) hot: ~3,600 QPS at recal
 
 - **Always create an index** for tables over a few thousand rows. Without an index, pgvector scans every row.
 - **Use HNSW** as your default index type. It offers the best recall/speed trade-off.
+- **Benchmark StreamingDiskANN** when the vector graph is too large to keep comfortably in memory.
 - **Increase `ef_search`** if recall is too low. Start with 100 and increase as needed, but set it with `SET LOCAL` inside the query's transaction or via `ALTER DATABASE … SET` — every plan pools on `:6432`, and a plain session `SET` is dropped by transaction pooling. The same applies to `ivfflat.probes`.
 - **Batch inserts** for loading large datasets. Use `COPY` or multi-row `INSERT` for best throughput.
 - **Choose the right distance operator** for your use case. Cosine (`<=>`) is the most common for text embeddings.

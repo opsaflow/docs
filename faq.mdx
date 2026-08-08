@@ -7,7 +7,7 @@ description: "Frequently asked questions about Rivestack"
   <Accordion title="What's the difference between Free, Solo, and HA?">
     - **Free ($0)**: a shared PostgreSQL database for development and testing. 2 GB storage, 5 connections, no backups, deleted after 30 days of inactivity.
     - **Solo ($29/mo)**: your own single-tenant VM (1 vCPU · 2 GB RAM · 30 GB NVMe) with daily backups, point-in-time recovery, and monitoring. Single node, so no automatic failover, but never deleted. Ideal for small production apps.
-    - **HA Cluster (from $49/node/mo)**: dedicated infrastructure with 1 to 3 nodes and automatic failover for production workloads that need zero-downtime resilience.
+    - **HA Cluster (from $49/node/mo)**: dedicated infrastructure with 1 to 3 nodes. Choose at least 2 nodes for automatic failover; applications must retry connections during a failover.
   </Accordion>
 
   <Accordion title="How do I upgrade from Free to Solo?">
@@ -19,22 +19,23 @@ description: "Frequently asked questions about Rivestack"
   </Accordion>
 
   <Accordion title="What extensions are available?">
-    Rivestack includes the following pre-installed extensions:
+    Rivestack enables the following extensions by default on new databases:
     - **pgvector**: Vector similarity search for AI/ML embeddings
+    - **pgvectorscale** (`vectorscale`): StreamingDiskANN indexes and scalable vector search
     - **uuid-ossp**: UUID generation
     - **pg_stat_statements**: SQL execution statistics tracking
     - **pgcrypto**: Cryptographic functions
     - **pg_trgm**: Trigram matching for similarity searches
 
-    Extensions are managed through the dashboard UI. Navigate to your database and add extensions from there.
+    Other supported extensions can be selected when creating or configuring a database. The dashboard shows the current list.
   </Accordion>
 
   <Accordion title="Are connections encrypted?">
-    Yes. All connections require SSL/TLS (`sslmode=require`). Unencrypted connections are rejected. No CA certificate download is needed.
+    Yes. All managed endpoints require TLS and use publicly trusted Let's Encrypt certificates. Use `sslmode=verify-full` so your client both encrypts the connection and verifies the database hostname. `sslmode=require` encrypts traffic but does not securely authenticate the server. No custom CA download is needed.
   </Accordion>
 
   <Accordion title="What happens if a node fails?">
-    On HA clusters with 2 or more nodes, failover is automatic. Patroni detects the failure and promotes a replica to primary within 10-30 seconds. The load balancer reroutes connections to the new primary. Your connection string does not change.
+    On HA clusters with 2 or more nodes, Patroni can promote a healthy replica and the load balancer keeps the same connection endpoint. Existing sessions disconnect, so applications must reconnect with bounded retries and backoff. Detection and promotion time depends on cluster and network conditions; Rivestack does not currently promise a fixed failover SLA. Because replication is asynchronous, a failure can also lose transactions that had not reached a replica.
 
     Single-node clusters do not have automatic failover. We recommend at least 2 nodes for production.
   </Accordion>
@@ -78,7 +79,7 @@ description: "Frequently asked questions about Rivestack"
   </Accordion>
 
   <Accordion title="Where is my data stored?">
-    Your data is stored on dedicated servers in the region you selected (EU, US, or Singapore). Backups are stored in S3-compatible object storage in the same region. Data is encrypted at rest and in transit.
+    Dedicated-plan data is stored on servers in the region you selected (EU, US, or Singapore), and backup traffic is sent to S3-compatible object storage over TLS. Database connections are encrypted in transit. Rivestack does not currently advertise application-level, customer-managed, or pgBackRest repository encryption at rest; contact us before relying on a specific at-rest encryption or compliance requirement.
   </Accordion>
 
   <Accordion title="Do you support read replicas?">

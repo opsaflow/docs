@@ -15,7 +15,7 @@ Rivestack is a managed PostgreSQL service that gives you production-ready databa
     Your own dedicated VM with daily backups, point-in-time recovery, and monitoring. $29/month, never deleted.
   </Card>
   <Card title="HA Cluster" icon="shield-halved">
-    Dedicated infrastructure with automatic failover, backups, and monitoring. Starting at $49/node/month.
+    Dedicated infrastructure with backups and monitoring. Choose 2 or more nodes for automatic failover. Starting at $49/node/month.
   </Card>
 </CardGroup>
 
@@ -64,7 +64,7 @@ Create your Rivestack account at [app.rivestack.io](https://app.rivestack.io). Y
        | Growth | 4 | 8 GB | 135 GB | $85/node/mo |
        | Scale | 8 | 16 GB | 295 GB | $159/node/mo |
 
-       Storage listed is fully available for your PostgreSQL database. 20 GB is reserved for the OS on each node.
+       Storage listed is fully available for your PostgreSQL database. 25 GB is reserved for the OS on each node.
     6. Choose the **number of nodes** (1-3). We recommend 2 or more for high availability.
     7. Review your total monthly cost and click **Create**.
     8. Complete checkout via our payment provider.
@@ -82,12 +82,12 @@ Once your database is ready, navigate to the **Connection** tab to find your cre
 - **Database**: Your database name
 - **Username**: Your database user
 - **Password**: Generated on creation (copy it from the dashboard)
-- **SSL Mode**: `require` (always enforced)
+- **SSL Mode**: `verify-full` (recommended and shown in the dashboard)
 
 Your connection string looks like this:
 
 ```
-postgresql://username:password@rs-abc12345.eu.db.rivestack.io:6432/mydb?sslmode=require
+postgresql://username:password@rs-abc12345.eu.db.rivestack.io:6432/mydb?sslmode=verify-full
 ```
 
 <Card title="Connection Guide" icon="plug" href="/connection-guide">
@@ -97,11 +97,11 @@ postgresql://username:password@rs-abc12345.eu.db.rivestack.io:6432/mydb?sslmode=
 ## What's included
 
 <Columns cols={2}>
-  <Card title="pgvector" icon="brain">
-    pgvector is enabled by default on your initial database. For new databases, add it through the dashboard or Terraform.
+  <Card title="Vector search" icon="brain">
+    pgvector and pgvectorscale are enabled by default on new databases, including StreamingDiskANN index support.
   </Card>
   <Card title="Extensions" icon="puzzle-piece">
-    Pre-installed extensions including uuid-ossp, pg_stat_statements, pgcrypto, and pg_trgm. Add them to your database from the dashboard.
+    Default extensions include uuid-ossp, pg_stat_statements, pgcrypto, and pg_trgm. The dashboard lists additional supported extensions.
   </Card>
   <Card title="SSL Encryption" icon="lock">
     All connections are encrypted with TLS. No unencrypted connections are allowed.

@@ -1,67 +1,91 @@
 ---
 title: "Security"
-description: "SSL, encryption, network security, and compliance"
+description: "TLS, network access controls, and infrastructure isolation"
 ---
 
-## Encryption
+## Encryption in transit
 
-### In transit
-
-All connections to Rivestack databases **require SSL/TLS**. Unencrypted connections are rejected at the protocol level.
+All client connections to Rivestack databases **require SSL/TLS**. Unencrypted client connections are rejected.
 
 | Setting | Value |
 |---------|-------|
-| SSL mode | `require` (enforced) |
-| TLS version | TLS 1.2+ |
-| Certificate | Signed by trusted public CA |
+| Recommended SSL mode | `verify-full` |
+| Minimum TLS version | TLS 1.2 |
+| Certificate | Let's Encrypt, signed by a public CA |
 
-No CA certificate download is needed, because standard PostgreSQL clients trust the certificate automatically.
+The certificate is renewed with ACME DNS-01 and covers the regional database hostnames. Standard PostgreSQL clients can validate it with their operating-system trust store; no Rivestack-specific CA download is needed.
 
+```text
+postgresql://user:pass@host:6432/mydb?sslmode=verify-full
 ```
-postgresql://user:pass@host:6432/mydb?sslmode=require
-```
 
-### At rest
+<Warning>
+  `sslmode=require` encrypts traffic but does not authenticate the database server. Use
+  `verify-full`, keep the hostname from the dashboard, and do not replace it with a raw IP address.
+</Warning>
 
-- **Database storage**: Encrypted at the volume level on all nodes
-- **Backups**: Encrypted in S3-compatible object storage
-- **WAL archives**: Encrypted alongside backups
+## Data at rest
+
+Rivestack does not currently advertise application-level or customer-managed encryption for the PostgreSQL data directory. Backup traffic is sent to S3-compatible object storage over TLS, but the current pgBackRest configuration does not add client-side repository encryption. Do not rely on an “encrypted at rest” claim when assessing compliance requirements.
+
+Contact [hi@rivestack.io](mailto:hi@rivestack.io) before placing data that requires a specific at-rest encryption control or customer-managed key policy.
 
 ## Network security
 
+### Shared cloud firewall
+
+Database VMs are covered by one reconciled Hetzner Cloud Firewall selected by server labels. This avoids Hetzner's per-project firewall limit. It exposes only the two documented database service ports and restricts SSH to Rivestack operations CIDRs; all other unsolicited public inbound traffic is dropped by the cloud firewall. Dedicated hosts also drop raw public PostgreSQL traffic on `5432`, leaving that port for the free shared service and private cluster traffic.
+
+Tenant allowlists are enforced on each database host, so adding customers does not create additional Hetzner firewalls:
+
+- Direct clusters use a persistent `nftables` source policy in front of PgBouncer.
+- HA clusters enable Hetzner Load Balancer PROXY protocol. A private HAProxy listener reads the original client address, applies the same source policy, and passes the PostgreSQL/TLS stream through to PgBouncer unchanged.
+- IPv4 and IPv6 addresses and CIDR networks are supported. An empty allowlist blocks new public database connections.
+
+### Configure an IP allowlist
+
+1. Open the dedicated cluster in the dashboard and select **Network**.
+2. Add each application, office, VPN, or CI egress address as an IP or CIDR. Both IPv4 and IPv6 are accepted; DNS names are not.
+3. Save the policy. The change is applied asynchronously, and the previous policy remains authoritative until the infrastructure job succeeds.
+
+New clusters start with `0.0.0.0/0` and `::/0`, which permits any source that can authenticate. Replace both public networks to restrict access. Saving an empty list intentionally blocks all new public database connections. Before restricting a production cluster, include every stable outbound address used by your applications, administrators, migrations, and monitoring.
+
+<Info>The load balancer's network connection normally hides the client address from a backend. Rivestack enables Hetzner PROXY protocol and terminates that header on the private HAProxy listener, so the allowlist evaluates the original client address without terminating PostgreSQL TLS.</Info>
+
+Changes are applied asynchronously to every cluster node. Existing established connections may continue until they close; the new policy controls new connections.
+
 ### Private networking
 
-Database nodes communicate over private networks. Only the load balancer endpoint is exposed to the public internet.
+Cluster nodes use tenant-private networks for database traffic and a regional private network for the distributed consensus service. Private-network placement is not a substitute for authentication or encryption, so client access is still protected by TLS and database credentials.
 
-### Port access
+### Public port
 
 | Port | Service | Access |
 |------|---------|--------|
-| 6432 | PostgreSQL | Direct to PgBouncer, or via the load balancer on an HA cluster |
+| 5432 | Free shared PostgreSQL | Public shared endpoint; TLS and database credentials required |
+| 6432 | PostgreSQL through PgBouncer | Public endpoint, restricted by the cluster IP allowlist |
+
+The dashboard hostname points directly to the VM for a single-node dedicated cluster and to one Hetzner Load Balancer after the cluster is scaled to HA.
 
 ## Authentication
 
-- **Database users**: Username/password authentication over SSL
-- **Dashboard**: Authenticated via Auth0 with email verification
-- **API**: API key authentication (used internally by the Terraform provider)
+- **Database users**: password authentication over required TLS
+- **Dashboard**: Auth0 authentication with email verification
+- **API**: authenticated application and provider requests
 
 ## Infrastructure
 
 | Component | Details |
 |-----------|---------|
-| **Data centers** | EU (Falkenstein, Germany), US (Virginia, USA), Asia Pacific (Singapore) |
-| **Node isolation** | Dedicated VMs per HA cluster |
-| **Internal communication** | Private network between cluster nodes |
-| **Backups** | Stored in S3-compatible object storage, separate from database nodes |
+| **Regions** | EU Central (Falkenstein), US East (Virginia), and Asia Pacific (Singapore, Solo only) |
+| **Dedicated plans** | Dedicated VMs per customer cluster |
+| **Internal communication** | Private networks between cluster components |
+| **Backups** | pgBackRest to S3-compatible object storage, separate from database nodes |
 
-## Compliance
+## Compliance language
 
-| Standard | Status |
-|----------|--------|
-| **GDPR** | EU Central region stores all data within the EU |
-| **Encryption in transit** | Enforced on all connections |
-| **Encryption at rest** | All storage volumes and backups |
+Selecting EU Central keeps the provisioned database nodes in the EU region. Data residency alone is not a compliance certification. Rivestack does not claim a compliance standard or an at-rest encryption control unless it is explicitly stated in your agreement.
 
 ## Reporting vulnerabilities
 
-If you discover a security vulnerability, please report it to [hi@rivestack.io](mailto:hi@rivestack.io).
+If you discover a security vulnerability, report it to [hi@rivestack.io](mailto:hi@rivestack.io).

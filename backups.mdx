@@ -15,7 +15,8 @@ Rivestack Solo and HA clusters include automated daily backups stored in S3-comp
 - **Storage**: S3-compatible object storage (off-site, separate from your database nodes)
 - **Backup type**: Full backups
 - **WAL archiving**: Continuous WAL (Write-Ahead Log) archiving for point-in-time recovery
-- **Encryption**: Backups are encrypted at rest in S3
+- **Transport encryption**: Backup traffic is sent to object storage over TLS
+- **Repository encryption**: The current pgBackRest configuration does not add client-side backup encryption
 
 Every backup captures a consistent snapshot of your entire PostgreSQL cluster, including all databases, users, and extensions.
 
@@ -43,7 +44,9 @@ By default, backups run **daily at 3:00 AM UTC**. You can customize the schedule
 | Full backup retention (Solo) | 7 days |
 | Full backup retention (HA clusters) | 14 days |
 
-Backups older than the retention period are automatically deleted.
+pgBackRest is configured to expire repository backups outside the retention window. Protected copies of manually triggered backups can remain visible after the original repository backup expires; contact support before relying on a protected copy for restore.
+
+<Warning>Rivestack does not currently advertise customer-managed or client-side encryption for the backup repository. If your workload requires a specific object-storage encryption or compliance control, contact us before relying on the service for that requirement.</Warning>
 
 ## Manual backups
 

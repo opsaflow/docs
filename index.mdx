@@ -1,11 +1,11 @@
 ---
 title: "Rivestack Documentation"
-description: "Managed PostgreSQL with pgvector, automatic failover, and daily backups"
+description: "Managed PostgreSQL with pgvector, pgvectorscale, automatic failover, and daily backups"
 ---
 
 ## Managed PostgreSQL, built for production
 
-Rivestack gives you production-ready PostgreSQL databases with high availability, automated backups, and pgvector for AI applications. Deploy in minutes, scale as you grow.
+Rivestack gives you production-ready PostgreSQL databases with high availability, automated backups, and pgvector plus pgvectorscale for AI applications. Deploy in minutes, scale as you grow.
 
 <CardGroup cols={2}>
   <Card title="Getting Started" icon="rocket" href="/getting-started">
@@ -25,14 +25,14 @@ Rivestack gives you production-ready PostgreSQL databases with high availability
 ## Why Rivestack
 
 <Columns cols={3}>
-  <Card title="pgvector built-in" icon="brain">
-    pgvector is enabled by default on your initial database. Build RAG, semantic search, and recommendation systems without extra setup.
+  <Card title="Vector search built-in" icon="brain">
+    pgvector and pgvectorscale are enabled by default. Build RAG, semantic search, and recommendation systems with HNSW or StreamingDiskANN indexes.
   </Card>
   <Card title="Automatic failover" icon="shield-halved">
-    Patroni-managed HA clusters with streaming replication. Failover happens in seconds with zero data loss.
+    Multi-node clusters use Patroni-managed streaming replication and automatic primary routing. Applications should reconnect during failover, and asynchronous replication can lose recent unreplicated transactions.
   </Card>
   <Card title="Daily backups" icon="clock-rotate-left">
-    Automated daily backups with 14-day retention. Point-in-time recovery to any second.
+    Automated daily backups with 7-day Solo or 14-day HA retention, plus point-in-time recovery within the retained WAL window.
   </Card>
 </Columns>
 
