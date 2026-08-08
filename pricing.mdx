@@ -15,7 +15,7 @@ description: "Plans, regions, and what's included"
     - 2 GB storage per database
     - 5 concurrent connections
     - 1 database
-    - pgvector on default database
+    - pgvector + pgvectorscale on default database
     - SSL encryption
     - All regions
     - Deleted after 30 days of inactivity
@@ -40,12 +40,12 @@ description: "Plans, regions, and what's included"
     For production workloads with automatic failover.
 
     - Dedicated infrastructure
-    - 1-3 nodes with automatic failover
+    - 1-3 nodes; automatic failover with 2+
     - Up to 100 connections
     - Automated daily backups (14-day retention)
     - Point-in-time recovery
     - Real-time monitoring
-    - pgvector + 4 extensions
+    - pgvector + pgvectorscale enabled by default
     - Email notifications
     - EU Central & US East (not Singapore)
   </Card>
@@ -89,7 +89,7 @@ The VM type and price differ by region (see [Per-region pricing](#per-region-pri
 | Feature | Details |
 |---------|---------|
 | **PostgreSQL 16, 17, 18** | Choose your major version at cluster creation |
-| **pgvector** | Vector similarity search for AI applications |
+| **pgvector + pgvectorscale** | Vector search with HNSW, IVFFlat, and StreamingDiskANN indexes |
 | **Automated backups** | Daily, with 7-day retention |
 | **Monitoring** | CPU, memory, disk, connections |
 | **SSL/TLS** | Enforced on all connections |
@@ -146,13 +146,13 @@ Every HA cluster includes the following at no additional cost:
 | Feature | Details |
 |---------|---------|
 | **PostgreSQL 16, 17, 18** | Choose your major version at cluster creation |
-| **pgvector** | Vector similarity search for AI applications |
-| **Extensions** | uuid-ossp, pg_stat_statements, pgcrypto, pg_trgm (add via dashboard) |
+| **pgvector + pgvectorscale** | Vector search with HNSW, IVFFlat, and StreamingDiskANN indexes |
+| **Extensions** | uuid-ossp, pg_stat_statements, pgcrypto, and pg_trgm enabled by default; more available in the dashboard |
 | **Automated backups** | Daily, with 14-day retention |
 | **Point-in-time recovery** | Restore to any second within retention window |
 | **Monitoring** | CPU, memory, disk, TPS, connections, cache hit ratio |
 | **SSL/TLS** | Enforced on all connections |
-| **High availability** | Patroni-managed automatic failover |
+| **High availability** | Patroni-managed automatic failover with 2 or more nodes; applications reconnect during failover |
 | **Load balancing** | Automatic connection routing |
 | **Email notifications** | Provisioning, backups, health alerts |
 | **SQL Editor** | Run queries directly from the dashboard |

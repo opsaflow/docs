@@ -16,7 +16,7 @@ Copy your connection string from the dashboard and use it directly:
     ```python
     import psycopg2
 
-    conn = psycopg2.connect("postgresql://user:pass@rs-xxx.eu.db.rivestack.io:6432/mydb?sslmode=require")
+    conn = psycopg2.connect("postgresql://user:pass@rs-xxx.eu.db.rivestack.io:6432/mydb?sslmode=verify-full")
     cur = conn.cursor()
     cur.execute("SELECT 1")
     print(cur.fetchone())
@@ -32,8 +32,7 @@ Copy your connection string from the dashboard and use it directly:
     const { Client } = require('pg');
 
     const client = new Client({
-      connectionString: 'postgresql://user:pass@rs-xxx.eu.db.rivestack.io:6432/mydb?sslmode=require',
-      ssl: { rejectUnauthorized: false }
+      connectionString: 'postgresql://user:pass@rs-xxx.eu.db.rivestack.io:6432/mydb?sslmode=verify-full'
     });
 
     await client.connect();
@@ -49,7 +48,7 @@ Copy your connection string from the dashboard and use it directly:
 
     ```go
     conn, err := pgx.Connect(context.Background(),
-        "postgresql://user:pass@rs-xxx.eu.db.rivestack.io:6432/mydb?sslmode=require")
+        "postgresql://user:pass@rs-xxx.eu.db.rivestack.io:6432/mydb?sslmode=verify-full")
     if err != nil {
         log.Fatal(err)
     }
@@ -58,7 +57,7 @@ Copy your connection string from the dashboard and use it directly:
   </Tab>
   <Tab title="psql">
     ```bash
-    psql "postgresql://user:pass@rs-xxx.eu.db.rivestack.io:6432/mydb?sslmode=require"
+    psql "postgresql://user:pass@rs-xxx.eu.db.rivestack.io:6432/mydb?sslmode=verify-full"
     ```
   </Tab>
 </Tabs>
@@ -74,7 +73,7 @@ Find your connection credentials in the Rivestack dashboard under the **Connecti
 | Database | Database name | `mydb` |
 | Username | Database user | `myuser` |
 | Password | User password | (from dashboard) |
-| SSL Mode | Always required | `require` |
+| SSL Mode | Certificate and hostname verification | `verify-full` |
 
 <Note>
   Port `6432` applies to every dedicated plan — Solo, Starter, Growth and Scale — on a
@@ -85,27 +84,27 @@ Find your connection credentials in the Rivestack dashboard under the **Connecti
 ## Connection string
 
 ```
-postgresql://username:password@host:6432/dbname?sslmode=require
+postgresql://username:password@host:6432/dbname?sslmode=verify-full
 ```
 
 <Tip>Click the copy button next to each field in the dashboard to copy values to your clipboard.</Tip>
 
 ## SSL / TLS
 
-All Rivestack connections **require SSL**. Unencrypted connections are rejected. Set `sslmode=require` in your connection string or driver configuration.
+All Rivestack connections **require SSL**. Unencrypted connections are rejected. Use `sslmode=verify-full` so the client also verifies the public CA chain and confirms that the certificate matches the database hostname. `sslmode=require` encrypts traffic but does not authenticate the server identity.
 
 No CA certificate download is needed, because Rivestack uses certificates signed by a trusted public CA.
 
 ## Connect with psql
 
 ```bash
-psql "host=rs-abc12345.eu.db.rivestack.io port=6432 dbname=mydb user=myuser sslmode=require"
+psql "host=rs-abc12345.eu.db.rivestack.io port=6432 dbname=mydb user=myuser sslmode=verify-full"
 ```
 
 You'll be prompted for your password. To include it inline:
 
 ```bash
-psql "postgresql://myuser:mypassword@rs-abc12345.eu.db.rivestack.io:6432/mydb?sslmode=require"
+psql "postgresql://myuser:mypassword@rs-abc12345.eu.db.rivestack.io:6432/mydb?sslmode=verify-full"
 ```
 
 ## Language examples
@@ -127,7 +126,7 @@ psql "postgresql://myuser:mypassword@rs-abc12345.eu.db.rivestack.io:6432/mydb?ss
         dbname="mydb",
         user="myuser",
         password="mypassword",
-        sslmode="require"
+        sslmode="verify-full"
     )
 
     cur = conn.cursor()
@@ -149,7 +148,7 @@ psql "postgresql://myuser:mypassword@rs-abc12345.eu.db.rivestack.io:6432/mydb?ss
 
     engine = create_engine(
         "postgresql://myuser:mypassword@rs-abc12345.eu.db.rivestack.io:6432/mydb",
-        connect_args={"sslmode": "require"}
+        connect_args={"sslmode": "verify-full"}
     )
 
     with engine.connect() as conn:
@@ -173,7 +172,7 @@ psql "postgresql://myuser:mypassword@rs-abc12345.eu.db.rivestack.io:6432/mydb?ss
       database: 'mydb',
       user: 'myuser',
       password: 'mypassword',
-      ssl: { rejectUnauthorized: false }
+      ssl: { rejectUnauthorized: true }
     });
 
     await client.connect();
@@ -188,8 +187,7 @@ psql "postgresql://myuser:mypassword@rs-abc12345.eu.db.rivestack.io:6432/mydb?ss
     const { Client } = require('pg');
 
     const client = new Client({
-      connectionString: 'postgresql://myuser:mypassword@rs-abc12345.eu.db.rivestack.io:6432/mydb?sslmode=require',
-      ssl: { rejectUnauthorized: false }
+      connectionString: 'postgresql://myuser:mypassword@rs-abc12345.eu.db.rivestack.io:6432/mydb?sslmode=verify-full'
     });
 
     await client.connect();
@@ -200,7 +198,7 @@ psql "postgresql://myuser:mypassword@rs-abc12345.eu.db.rivestack.io:6432/mydb?ss
     Set your `DATABASE_URL` in `.env`:
 
     ```
-    DATABASE_URL="postgresql://myuser:mypassword@rs-abc12345.eu.db.rivestack.io:6432/mydb?sslmode=require"
+    DATABASE_URL="postgresql://myuser:mypassword@rs-abc12345.eu.db.rivestack.io:6432/mydb?sslmode=verify-full"
     ```
   </Tab>
   <Tab title="Go">
@@ -222,7 +220,7 @@ psql "postgresql://myuser:mypassword@rs-abc12345.eu.db.rivestack.io:6432/mydb?ss
     )
 
     func main() {
-        connStr := "postgresql://myuser:mypassword@rs-abc12345.eu.db.rivestack.io:6432/mydb?sslmode=require"
+        connStr := "postgresql://myuser:mypassword@rs-abc12345.eu.db.rivestack.io:6432/mydb?sslmode=verify-full"
 
         conn, err := pgx.Connect(context.Background(), connStr)
         if err != nil {
@@ -254,7 +252,7 @@ psql "postgresql://myuser:mypassword@rs-abc12345.eu.db.rivestack.io:6432/mydb?ss
     )
 
     func main() {
-        connStr := "host=rs-abc12345.eu.db.rivestack.io port=6432 user=myuser password=mypassword dbname=mydb sslmode=require"
+        connStr := "host=rs-abc12345.eu.db.rivestack.io port=6432 user=myuser password=mypassword dbname=mydb sslmode=verify-full"
 
         db, err := sql.Open("postgres", connStr)
         if err != nil {
@@ -292,11 +290,11 @@ All connections use port `6432` — the same port a single-node cluster uses. Sc
 <AccordionGroup>
   <Accordion title="Connection refused">
     - Verify your host, port, and credentials are correct.
-    - Ensure you're using `sslmode=require`.
+    - Ensure you're using `sslmode=verify-full` and the dashboard hostname, not a raw IP address.
     - Check that your host and port are correct.
   </Accordion>
   <Accordion title="SSL errors">
-    All connections require SSL. Make sure your client is configured with `sslmode=require`. You do not need to download a CA certificate.
+    All connections require SSL. Configure `sslmode=verify-full` and connect with the hostname shown in the dashboard. The certificate chains to a public CA, so no custom CA download is needed.
   </Accordion>
   <Accordion title="Too many connections">
     Free tier databases are limited to 5 connections. HA clusters support up to 100. Close idle connections or use connection pooling in your application.
