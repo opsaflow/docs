@@ -5,7 +5,7 @@ description: "Frequently asked questions about Rivestack"
 
 <AccordionGroup>
   <Accordion title="What's the difference between Free, Solo, and HA?">
-    - **Free ($0)**: a shared PostgreSQL database for development and testing. 2 GB storage, 5 connections, no backups, deleted after 30 days of inactivity.
+    - **Free ($0)**: a shared PostgreSQL database for development and testing. 2 GB storage, 15 connections, no backups, deleted after 30 days of inactivity.
     - **Solo ($29/mo)**: your own single-tenant VM (1 vCPU · 2 GB RAM · 30 GB NVMe) with daily backups, point-in-time recovery, and monitoring. Single node, so no automatic failover, but never deleted. Ideal for small production apps.
     - **HA Cluster (from $49/node/mo)**: dedicated infrastructure with 1 to 3 nodes. Choose at least 2 nodes for automatic failover; applications must retry connections during a failover.
   </Accordion>
@@ -63,7 +63,7 @@ description: "Frequently asked questions about Rivestack"
   </Accordion>
 
   <Accordion title="What are the connection limits?">
-    - **Free tier**: 5 connections per database
+    - **Free tier**: 15 connections per database
     - **Solo**: 100 connections
     - **HA clusters**: 100 connections per cluster
 
@@ -87,7 +87,7 @@ description: "Frequently asked questions about Rivestack"
   </Accordion>
 
   <Accordion title="Is there a free trial for HA clusters?">
-    There is no free trial for HA clusters, but the **Free tier** lets you explore Rivestack at no cost with a shared PostgreSQL database (2 GB storage, 5 connections).
+    There is no free trial for HA clusters, but the **Free tier** lets you explore Rivestack at no cost with a shared PostgreSQL database (2 GB storage, 15 connections).
   </Accordion>
 
   <Accordion title="How do I monitor my database?">
