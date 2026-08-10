@@ -129,9 +129,9 @@ ALTER DATABASE appdb SET hnsw.ef_search = 100;
 ```
 
 <Warning>
-  **A plain session `SET hnsw.ef_search` is silently ignored.** Every plan connects through PgBouncer in **transaction-pooling** mode on port `6432`, so a bare `SET hnsw.ef_search = 100;` runs in its own transaction and is reset before your next query, leaving you with the default (`40`) instead. Always either use `SET LOCAL` *inside the same transaction* as the query, or set a persistent default with `ALTER DATABASE appdb SET hnsw.ef_search = …` (or `ALTER ROLE appdb SET …`).
+  **A plain session `SET hnsw.ef_search` is silently ignored.** Every dedicated plan (Solo, Starter, Growth, Scale) connects through PgBouncer in **transaction-pooling** mode on port `6432`, so a bare `SET hnsw.ef_search = 100;` runs in its own transaction and is reset before your next query, leaving you with the default (`40`) instead. Always either use `SET LOCAL` *inside the same transaction* as the query, or set a persistent default with `ALTER DATABASE appdb SET hnsw.ef_search = …` (or `ALTER ROLE appdb SET …`).
 
-  This holds on HA clusters too. The load balancer and source-filtering HAProxy gateway pass the TLS stream to PgBouncer rather than to PostgreSQL directly, so scaling up does not turn session-level `SET` back on.
+  Free databases connect directly to PostgreSQL on port `5432`, where a plain session `SET` works normally. This holds on HA clusters too. The load balancer and source-filtering HAProxy gateway pass the TLS stream to PgBouncer rather than to PostgreSQL directly, so scaling up does not turn session-level `SET` back on.
 </Warning>
 
 ### IVFFlat index

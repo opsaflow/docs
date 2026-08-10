@@ -63,11 +63,13 @@ description: "Frequently asked questions about Rivestack"
   </Accordion>
 
   <Accordion title="What are the connection limits?">
-    - **Free tier**: 15 connections per database
-    - **Solo**: 100 connections
-    - **HA clusters**: 100 connections per cluster
+    - **Free**: 15 direct PostgreSQL connections per database
+    - **Solo**: 500 pooled client connections, 20 transaction slots per database
+    - **Starter**: 2,000 pooled client connections, 25 transaction slots
+    - **Growth**: 5,000 pooled client connections, 30 transaction slots
+    - **Scale**: 10,000 pooled client connections, 40 transaction slots
 
-    Use connection pooling in your application if you need more concurrent connections.
+    Dedicated plans connect through PgBouncer in transaction-pooling mode, so clients beyond the slot count queue briefly instead of failing. Adding HA nodes improves availability, not connection capacity. See [Limits](/limits) for the full explanation.
   </Accordion>
 
   <Accordion title="How is billing handled?">
