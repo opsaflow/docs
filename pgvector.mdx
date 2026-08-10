@@ -66,7 +66,7 @@ response = openai.embeddings.create(
 embedding = response.data[0].embedding
 
 # Store in Rivestack
-conn = psycopg2.connect("postgresql://user:pass@host:6432/mydb?sslmode=verify-full")
+conn = psycopg2.connect("postgresql://user:pass@host:6432/mydb?sslmode=verify-full&sslrootcert=system")
 cur = conn.cursor()
 cur.execute(
     "INSERT INTO documents (content, embedding) VALUES (%s, %s)",
@@ -187,7 +187,7 @@ def search(query: str, top_k: int = 5):
     query_embedding = response.data[0].embedding
 
     # 2. Search Rivestack for similar documents
-    conn = psycopg2.connect("postgresql://user:pass@host:6432/mydb?sslmode=verify-full")
+    conn = psycopg2.connect("postgresql://user:pass@host:6432/mydb?sslmode=verify-full&sslrootcert=system")
     cur = conn.cursor()
     cur.execute("""
         SELECT content, embedding <=> %s::vector AS distance
