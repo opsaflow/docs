@@ -317,10 +317,15 @@ All connections use port `6432` — the same port a single-node cluster uses. Sc
 
 ## Connection limits
 
-| Tier | Max Connections |
-|------|----------------|
-| Free | 15 |
-| HA Cluster | 100 |
+Dedicated plans connect through PgBouncer in transaction-pooling mode: the first number is how many client connections the pooled endpoint accepts, the second how many transactions execute on PostgreSQL at once per database. Clients beyond the slot count wait briefly instead of failing.
+
+| Plan | Client connections | Transaction slots per database |
+|------|--------------------|-------------------------------|
+| Free | 15 (direct) | 15 |
+| Solo | 500 | 20 |
+| Starter | 2,000 | 25 |
+| Growth | 5,000 | 30 |
+| Scale | 10,000 | 40 |
 
 ## Troubleshooting
 
@@ -344,6 +349,6 @@ All connections use port `6432` — the same port a single-node cluster uses. Sc
     to download.
   </Accordion>
   <Accordion title="Too many connections">
-    Free tier databases are limited to 15 connections. HA clusters support up to 100. Close idle connections or use connection pooling in your application.
+    Free databases allow 15 direct connections. Dedicated plans accept 500 to 10,000 pooled client connections depending on server type, with 20 to 40 transaction slots per database; extra clients queue briefly rather than failing. See the connection limits table above.
   </Accordion>
 </AccordionGroup>
