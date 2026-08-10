@@ -50,7 +50,7 @@ For applications that need more than 100 concurrent connections, use a client-si
     connection_pool = pool.ThreadedConnectionPool(
         minconn=5,
         maxconn=20,
-        dsn="postgresql://user:pass@host:6432/mydb?sslmode=verify-full"
+        dsn="postgresql://user:pass@host:6432/mydb?sslmode=verify-full&sslrootcert=system"
     )
 
     conn = connection_pool.getconn()

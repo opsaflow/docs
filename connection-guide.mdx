@@ -16,7 +16,7 @@ Copy your connection string from the dashboard and use it directly:
     ```python
     import psycopg2
 
-    conn = psycopg2.connect("postgresql://user:pass@rs-xxx.eu.db.rivestack.io:6432/mydb?sslmode=verify-full")
+    conn = psycopg2.connect("postgresql://user:pass@rs-xxx.eu.db.rivestack.io:6432/mydb?sslmode=verify-full&sslrootcert=system")
     cur = conn.cursor()
     cur.execute("SELECT 1")
     print(cur.fetchone())
@@ -57,10 +57,17 @@ Copy your connection string from the dashboard and use it directly:
   </Tab>
   <Tab title="psql">
     ```bash
-    psql "postgresql://user:pass@rs-xxx.eu.db.rivestack.io:6432/mydb?sslmode=verify-full"
+    psql "postgresql://user:pass@rs-xxx.eu.db.rivestack.io:6432/mydb?sslmode=verify-full&sslrootcert=system"
     ```
   </Tab>
 </Tabs>
+
+<Note>
+  The Python and psql examples carry `sslrootcert=system` because libpq does not read your
+  operating system's trust store on its own. Leave it out and the connection fails with
+  `root certificate file "~/.postgresql/root.crt" does not exist`. See
+  [SSL / TLS](#ssl-tls) for the detail and for what to use on libpq older than 16.
+</Note>
 
 ## Connection details
 
@@ -87,24 +94,53 @@ Find your connection credentials in the Rivestack dashboard under the **Connecti
 postgresql://username:password@host:6432/dbname?sslmode=verify-full
 ```
 
+For psql and the Python drivers, add `sslrootcert=system`:
+
+```
+postgresql://username:password@host:6432/dbname?sslmode=verify-full&sslrootcert=system
+```
+
 <Tip>Click the copy button next to each field in the dashboard to copy values to your clipboard.</Tip>
 
 ## SSL / TLS
 
-All Rivestack connections **require SSL**. Unencrypted connections are rejected. Use `sslmode=verify-full` so the client also verifies the public CA chain and confirms that the certificate matches the database hostname. `sslmode=require` encrypts traffic but does not authenticate the server identity.
+All Rivestack connections **require SSL**. Unencrypted connections are rejected. Use `sslmode=verify-full` so the client also verifies the CA chain and confirms that the certificate matches the database hostname. `sslmode=require` encrypts traffic but does not authenticate the server identity.
 
-No CA certificate download is needed, because Rivestack uses certificates signed by a trusted public CA.
+There is no CA certificate to download. Rivestack certificates are issued by Let's Encrypt, which every operating system already trusts.
+
+### Point libpq at your system's trusted roots
+
+psql and the Python drivers are built on libpq, and libpq does **not** read your operating system's trust store on its own. With `sslmode=verify-full` it looks for a file at `~/.postgresql/root.crt`, and on most machines that file does not exist, so the connection fails before it reaches the server:
+
+```
+psql: error: connection to server at "rs-abc12345.eu.db.rivestack.io" failed:
+root certificate file "/home/you/.postgresql/root.crt" does not exist
+```
+
+Add `sslrootcert=system` to tell libpq to use the roots your system already trusts:
+
+```bash
+psql "postgresql://myuser:mypassword@rs-abc12345.eu.db.rivestack.io:6432/mydb?sslmode=verify-full&sslrootcert=system"
+```
+
+<Note>
+  `sslrootcert=system` requires libpq 16 or newer. On older clients, give it the path to your
+  system bundle instead: `/etc/ssl/certs/ca-certificates.crt` on Debian and Ubuntu,
+  `/etc/pki/tls/certs/ca-bundle.crt` on RHEL and Fedora.
+</Note>
+
+Node.js, Go and Java drivers do not need this parameter. They use their own TLS stacks, which trust the system roots by default.
 
 ## Connect with psql
 
 ```bash
-psql "host=rs-abc12345.eu.db.rivestack.io port=6432 dbname=mydb user=myuser sslmode=verify-full"
+psql "host=rs-abc12345.eu.db.rivestack.io port=6432 dbname=mydb user=myuser sslmode=verify-full sslrootcert=system"
 ```
 
 You'll be prompted for your password. To include it inline:
 
 ```bash
-psql "postgresql://myuser:mypassword@rs-abc12345.eu.db.rivestack.io:6432/mydb?sslmode=verify-full"
+psql "postgresql://myuser:mypassword@rs-abc12345.eu.db.rivestack.io:6432/mydb?sslmode=verify-full&sslrootcert=system"
 ```
 
 ## Language examples
@@ -126,7 +162,8 @@ psql "postgresql://myuser:mypassword@rs-abc12345.eu.db.rivestack.io:6432/mydb?ss
         dbname="mydb",
         user="myuser",
         password="mypassword",
-        sslmode="verify-full"
+        sslmode="verify-full",
+        sslrootcert="system"
     )
 
     cur = conn.cursor()
@@ -282,7 +319,7 @@ All connections use port `6432` — the same port a single-node cluster uses. Sc
 
 | Tier | Max Connections |
 |------|----------------|
-| Free | 5 |
+| Free | 15 |
 | HA Cluster | 100 |
 
 ## Troubleshooting
@@ -293,8 +330,18 @@ All connections use port `6432` — the same port a single-node cluster uses. Sc
     - Ensure you're using `sslmode=verify-full` and the dashboard hostname, not a raw IP address.
     - Check that your host and port are correct.
   </Accordion>
+  <Accordion title="root certificate file ... does not exist">
+    psql and the Python drivers use libpq, which does not read your operating system's trust
+    store on its own. Add `sslrootcert=system` to the connection string so it uses the roots
+    your system already trusts. On libpq older than 16, give it the path to your system bundle
+    instead, such as `/etc/ssl/certs/ca-certificates.crt`. There is no CA file to download from
+    us. See [SSL / TLS](#ssl-tls).
+  </Accordion>
   <Accordion title="SSL errors">
-    All connections require SSL. Configure `sslmode=verify-full` and connect with the hostname shown in the dashboard. The certificate chains to a public CA, so no custom CA download is needed.
+    All connections require SSL. Configure `sslmode=verify-full` and connect with the hostname
+    shown in the dashboard, not a raw IP address, since `verify-full` checks the hostname against
+    the certificate. Rivestack certificates are issued by Let's Encrypt, so there is no custom CA
+    to download.
   </Accordion>
   <Accordion title="Too many connections">
     Free tier databases are limited to 15 connections. HA clusters support up to 100. Close idle connections or use connection pooling in your application.
