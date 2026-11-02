@@ -8,18 +8,18 @@ description: "Create your first managed PostgreSQL cluster on Rivestack"
 Rivestack is a managed PostgreSQL service that gives you production-ready databases in minutes. Start on a **dedicated Solo VM** ($29/month, with a 7-day trial on the first subscription), and step up to an **HA cluster** when you need automatic failover.
 
 <CardGroup cols={3}>
-  <Card title="Solo trial" icon="cube">
-    New databases start on Solo. The first subscription includes a 7-day trial. The shared free tier is closed to new databases.
+  <Card title="7-day trial" icon="cube">
+    Your first Solo subscription includes a 7-day trial. A card is required at checkout.
   </Card>
   <Card title="Solo" icon="server">
-    Your own dedicated VM with daily backups, point-in-time recovery, and monitoring. $29/month, never deleted.
+    Your own dedicated VM with daily backups, point-in-time recovery, and monitoring. $29/month in every region, never deleted.
   </Card>
   <Card title="HA Cluster" icon="shield-halved">
     Dedicated infrastructure with backups and monitoring. Choose 2 or more nodes for automatic failover. Starting at $49/node/month.
   </Card>
 </CardGroup>
 
-<Tip>Already have a free database? You can [upgrade it to Solo](/pricing#upgrading-from-free) in one click, and we migrate your data across automatically.</Tip>
+<Tip>The free shared tier no longer accepts new databases. If you already have a legacy shared (free) database, you can [upgrade it to Solo](/pricing#upgrading-from-free) in one click, and we migrate your data across automatically.</Tip>
 
 ## Create your first cluster
 
@@ -42,13 +42,13 @@ Create your Rivestack account at [app.rivestack.io](https://app.rivestack.io). Y
     If you already have an older shared database, upgrade it to Solo from the dashboard. The data is copied across and the old database stays online until you delete it.
   </Tab>
   <Tab title="Solo">
-    1. From the dashboard, click **Create Database** (or **Upgrade** on an existing free database).
+    1. From the dashboard, click **Create Database** (or **Upgrade** on an existing legacy shared (free) database). The free shared tier no longer accepts new databases.
     2. Enter a **name**.
     3. Select **Solo** as the plan.
-    4. Choose your **region** (EU, US, or Singapore). Pricing varies by region, and EU is cheapest. See [Pricing](/pricing#per-region-pricing).
+    4. Choose your **region** (EU, US, or Singapore). Solo is $29/month in every region. HA tiers cost more in US East than in EU Central. See [Pricing](/pricing#per-region-pricing).
     5. Review the cost (from $29/month) and complete checkout.
 
-    Your dedicated VM provisions in ~3 minutes. If you upgraded a free database, we migrate its data across automatically, and the free database stays online until you delete it.
+    Your dedicated VM provisions in ~3 minutes. If you upgraded a legacy shared (free) database, we migrate its data across automatically, and the legacy database stays online until you delete it.
   </Tab>
   <Tab title="HA Cluster">
     1. From the dashboard, click **Create Database**.
