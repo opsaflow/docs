@@ -5,11 +5,11 @@ description: "Create your first managed PostgreSQL cluster on Rivestack"
 
 ## Overview
 
-Rivestack is a managed PostgreSQL service that gives you production-ready databases in minutes. Start on the **free shared tier**, move to a **dedicated Solo VM** when you go to production, and step up to an **HA cluster** when you need automatic failover.
+Rivestack is a managed PostgreSQL service that gives you production-ready databases in minutes. Start on a **dedicated Solo VM** ($29/month, with a 7-day trial on the first subscription), and step up to an **HA cluster** when you need automatic failover.
 
 <CardGroup cols={3}>
-  <Card title="Free" icon="cube">
-    Shared PostgreSQL for development and testing. 2 GB storage, up to 15 connections. No credit card required.
+  <Card title="Solo trial" icon="cube">
+    New databases start on Solo. The first subscription includes a 7-day trial. The shared free tier is closed to new databases.
   </Card>
   <Card title="Solo" icon="server">
     Your own dedicated VM with daily backups, point-in-time recovery, and monitoring. $29/month, never deleted.
@@ -30,14 +30,16 @@ Create your Rivestack account at [app.rivestack.io](https://app.rivestack.io). Y
 ### Step 2: Create a database
 
 <Tabs>
-  <Tab title="Free Tier">
-    1. From the dashboard, click **Create Database**.
-    2. Enter a **database name** (or use the auto-generated suggestion).
-    3. Select **Free** as the plan.
-    4. Choose your **region** (EU, US, or Singapore).
-    5. Click **Create**.
+  <Tab title="Solo trial">
+    New databases are Solo. The shared free tier no longer accepts creates.
 
-    Your database is ready immediately. You'll see it on your dashboard with connection details.
+    1. From the dashboard, click **Create Database**.
+    2. Enter a **name**.
+    3. Select **Solo**.
+    4. Choose your **region** (EU, US, or Singapore).
+    5. Complete checkout. The first Solo subscription includes a 7-day trial.
+
+    If you already have an older shared database, upgrade it to Solo from the dashboard. The data is copied across and the old database stays online until you delete it.
   </Tab>
   <Tab title="Solo">
     1. From the dashboard, click **Create Database** (or **Upgrade** on an existing free database).
