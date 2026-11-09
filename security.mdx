@@ -9,7 +9,8 @@ All client connections to Rivestack databases **require SSL/TLS**. Unencrypted c
 
 | Setting | Value |
 |---------|-------|
-| Recommended SSL mode | `verify-full` |
+| Dedicated SSL mode | `verify-full` on port `6432` |
+| Hobby SSL mode | `sslmode=require` on port `5432` |
 | Minimum TLS version | TLS 1.2 |
 | Certificate | Let's Encrypt, signed by a public CA |
 
@@ -20,8 +21,7 @@ postgresql://user:pass@host:6432/mydb?sslmode=verify-full
 ```
 
 <Warning>
-  `sslmode=require` encrypts traffic but does not authenticate the database server. Use
-  `verify-full`, keep the hostname from the dashboard, and do not replace it with a raw IP address.
+  Dedicated plans use `sslmode=verify-full` on port `6432`. Keep the hostname from the dashboard, and do not replace it with a raw IP address. Hobby connects directly to Postgres on port `5432` with `sslmode=require`. There is no PgBouncer or pooler on Hobby.
 </Warning>
 
 ## Data at rest
@@ -34,7 +34,7 @@ Contact [hi@rivestack.io](mailto:hi@rivestack.io) before placing data that requi
 
 ### Shared cloud firewall
 
-Database VMs are covered by one reconciled Hetzner Cloud Firewall selected by server labels. This avoids Hetzner's per-project firewall limit. It exposes only the two documented database service ports and restricts SSH to Rivestack operations CIDRs; all other unsolicited public inbound traffic is dropped by the cloud firewall. Dedicated hosts also drop raw public PostgreSQL traffic on `5432`, leaving that port for the free shared service and private cluster traffic.
+Database VMs are covered by one reconciled Hetzner Cloud Firewall selected by server labels. This avoids Hetzner's per-project firewall limit. It exposes only the two documented database service ports and restricts SSH to Rivestack operations CIDRs; all other unsolicited public inbound traffic is dropped by the cloud firewall. Dedicated hosts also drop raw public PostgreSQL traffic on `5432`, leaving that port for the Hobby shared service and private cluster traffic.
 
 Tenant allowlists are enforced on each database host, so adding customers does not create additional Hetzner firewalls:
 
@@ -62,7 +62,7 @@ Cluster nodes use tenant-private networks for database traffic and a regional pr
 
 | Port | Service | Access |
 |------|---------|--------|
-| 5432 | Free shared PostgreSQL | Public shared endpoint; TLS and database credentials required |
+| 5432 | Hobby shared PostgreSQL | Direct to Postgres with `sslmode=require`. No PgBouncer or pooler. Up to 20 connections per database. |
 | 6432 | PostgreSQL through PgBouncer | Public endpoint, restricted by the cluster IP allowlist |
 
 The dashboard hostname points directly to the VM for a single-node dedicated cluster and to one Hetzner Load Balancer after the cluster is scaled to HA.

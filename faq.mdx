@@ -4,14 +4,14 @@ description: "Frequently asked questions about Rivestack"
 ---
 
 <AccordionGroup>
-  <Accordion title="What's the difference between Free, Solo, and HA?">
-    - **Free ($0)**: a shared PostgreSQL database for development and testing. 2 GB storage, 15 connections, no backups, deleted after 30 days of inactivity.
+  <Accordion title="What's the difference between Hobby, Solo, and HA?">
+    - **Hobby ($9/mo)**: shared Postgres for development and testing, available in EU Central (`eu-central`) only. One database per Hobby subscription. Up to 20 connections, direct to Postgres on port `5432` with `sslmode=require`. No PgBouncer or pooler. 5 GB soft quota, with an email warning at 80%. At 100%, connections are stopped and existing sessions are closed until usage drops below 90%. No high availability or read replicas. Hobby databases get daily full backups plus continuous WAL archiving, kept 14 days. Restores are whole-cluster and done by Rivestack support. There is no self-service per-database restore and no point-in-time recovery for customers. A Hobby database is deleted only when its subscription is cancelled or the account is deleted.
     - **Solo ($29/mo)**: your own single-tenant VM (1 vCPU · 2 GB RAM · 30 GB NVMe) with daily backups, point-in-time recovery, and monitoring. Single node, so no automatic failover, but never deleted. Ideal for small production apps.
     - **HA Cluster (from $49/node/mo)**: dedicated infrastructure with 1 to 3 nodes. Choose at least 2 nodes for automatic failover; applications must retry connections during a failover.
   </Accordion>
 
-  <Accordion title="How do I upgrade from Free to Solo?">
-    Open the free database in your dashboard and click **Upgrade**. We provision your dedicated Solo VM and **migrate your data across automatically** (typically ~3 minutes). Your free database stays online and untouched until you delete it, so you can verify everything first, then just point your app at the new host and credentials.
+  <Accordion title="How do I upgrade from Hobby to Solo?">
+    Open the Hobby database in your dashboard and click **Upgrade**. We provision your dedicated Solo VM and **migrate your data across automatically** (typically ~3 minutes). Your Hobby database stays online and untouched until you delete it, so you can verify everything first, then just point your app at the new host and credentials.
   </Accordion>
 
   <Accordion title="What PostgreSQL version does Rivestack use?">
@@ -31,7 +31,7 @@ description: "Frequently asked questions about Rivestack"
   </Accordion>
 
   <Accordion title="Are connections encrypted?">
-    Yes. All managed endpoints require TLS and use publicly trusted Let's Encrypt certificates. Use `sslmode=verify-full` so your client both encrypts the connection and verifies the database hostname. `sslmode=require` encrypts traffic but does not securely authenticate the server. No custom CA download is needed.
+    Yes. All managed endpoints require TLS and use publicly trusted Let's Encrypt certificates. Dedicated plans use `sslmode=verify-full` so the client encrypts the connection and verifies the database hostname. Hobby connects directly to Postgres on port `5432` with `sslmode=require`. No custom CA download is needed.
   </Accordion>
 
   <Accordion title="What happens if a node fails?">
@@ -41,11 +41,11 @@ description: "Frequently asked questions about Rivestack"
   </Accordion>
 
   <Accordion title="How do backups work?">
-    Solo and HA clusters include automated daily backups via pgBackRest, stored in S3-compatible object storage. Retention is 7 days on Solo and 14 days on HA clusters. You can also trigger manual backups and restore to any point in time within the retention window. Free tier databases are not backed up. See the [Backups & Restore](/backups) guide for details.
+    Solo and HA clusters include automated daily backups via pgBackRest, stored in S3-compatible object storage. Retention is 7 days on Solo and 14 days on HA clusters. You can also trigger manual backups and restore to any point in time within the retention window. Hobby databases get daily full backups plus continuous WAL archiving, kept 14 days. Restores are whole-cluster and done by Rivestack support. There is no self-service per-database restore and no point-in-time recovery for customers. See the [Backups & Restore](/backups) guide for details.
   </Accordion>
 
   <Accordion title="Can I restore to a specific point in time?">
-    Yes. Rivestack supports point-in-time recovery (PITR) on Solo and HA clusters. Continuous WAL archiving lets you restore to any second within your backup retention window. Initiate a restore from the Backup tab in the dashboard.
+    Yes, on Solo and HA clusters. Continuous WAL archiving lets you restore to any second within your backup retention window. Initiate a restore from the Backup tab in the dashboard. Hobby does not include point-in-time recovery.
   </Accordion>
 
   <Accordion title="What regions are available?">
@@ -53,7 +53,7 @@ description: "Frequently asked questions about Rivestack"
     - **US East**: Virginia, USA
     - **Asia Pacific**: Singapore (Solo plan only)
 
-    Free and Solo are available in all regions. The HA tiers (Starter/Growth/Scale) are available in EU Central and US East only, so Singapore offers the Solo plan only. Pricing is set per region, and **EU Central is the cheapest**. See [Pricing](/pricing#per-region-pricing).
+    Hobby is available in EU Central (`eu-central`) only. Solo is available in all regions. The HA tiers (Starter/Growth/Scale) are available in EU Central and US East only, so Singapore offers the Solo plan only. Pricing is set per region, and **EU Central is the cheapest**. See [Pricing](/pricing#per-region-pricing).
   </Accordion>
 
   <Accordion title="Can I scale my cluster?">
@@ -63,7 +63,7 @@ description: "Frequently asked questions about Rivestack"
   </Accordion>
 
   <Accordion title="What are the connection limits?">
-    - **Free**: 15 direct PostgreSQL connections per database
+    - **Hobby**: up to 20 connections per database, direct to Postgres on port `5432` with `sslmode=require`. No PgBouncer or pooler.
     - **Solo**: 500 pooled client connections, 20 transaction slots per database
     - **Starter**: 2,000 pooled client connections, 25 transaction slots
     - **Growth**: 5,000 pooled client connections, 30 transaction slots
@@ -85,14 +85,16 @@ description: "Frequently asked questions about Rivestack"
   </Accordion>
 
   <Accordion title="Do you support read replicas?">
-    Not as read-serving replicas yet. HA clusters with 2 or more nodes run streaming-replication standbys for **automatic failover**. All connections go through port `6432`, and the load balancer routes every query (reads included) to the primary. A separate read-only replica endpoint that lets you offload reads is on our roadmap.
+    Not as read-serving replicas yet. Hobby has no read replicas. HA clusters with 2 or more nodes run streaming-replication standbys for **automatic failover**. Dedicated connections go through port `6432`, and the load balancer routes every query (reads included) to the primary. A separate read-only replica endpoint that lets you offload reads is on our roadmap.
   </Accordion>
 
   <Accordion title="Is there a free trial for HA clusters?">
-    There is no free trial for HA clusters, but the **Free tier** lets you explore Rivestack at no cost with a shared PostgreSQL database (2 GB storage, 15 connections).
+    There is no free trial for HA clusters. Hobby is shared Postgres at $9/month in EU Central (`eu-central`) only, with one database per subscription, up to 20 direct connections on port `5432` (`sslmode=require`), and a 5 GB soft quota.
   </Accordion>
 
   <Accordion title="How do I monitor my database?">
-    The dashboard provides real-time metrics including TPS, connections, CPU, memory, disk I/O, cache hit ratio, and replication lag. View historical data over 1 hour, 24 hours, or 7 days. See the [Monitoring](/monitoring) guide.
+    On Solo and HA clusters, the dashboard provides real-time metrics including TPS, connections, CPU, memory, disk I/O, cache hit ratio, and replication lag. You can view historical data over 1 hour, 24 hours, or 7 days. See the [Monitoring](/monitoring) guide.
+
+    Hobby shows a point-in-time snapshot of database size and percent of quota, active connections, cache hit ratio, transactions, rows, and deadlocks. Hobby has no historical graphs, TPS or latency series, or alerts.
   </Accordion>
 </AccordionGroup>

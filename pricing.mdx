@@ -6,19 +6,19 @@ description: "Plans, regions, and what's included"
 ## Plans
 
 <CardGroup cols={3}>
-  <Card title="Free" icon="cube">
-    **$0/month**
+  <Card title="Hobby" icon="cube">
+    **$9/month**
 
-    For development and testing.
+    Shared Postgres for development and testing.
 
-    - Shared PostgreSQL instance
-    - 2 GB storage per database
-    - 15 concurrent connections
-    - 1 database
+    - One database per Hobby subscription
+    - Up to 20 connections, direct to Postgres on port `5432` with `sslmode=require`
+    - No PgBouncer or pooler
+    - 5 GB soft quota, with an email warning at 80%. At 100%, connections are stopped and existing sessions are closed until usage drops below 90%
     - pgvector + pgvectorscale on default database
-    - SSL encryption
-    - All regions
-    - Deleted after 30 days of inactivity
+    - EU Central (`eu-central`) only
+    - No high availability, read replicas, or point-in-time recovery
+    - Deleted only when the subscription is cancelled or the account is deleted
   </Card>
   <Card title="Solo" icon="database">
     **$29/month**
@@ -57,6 +57,7 @@ Pricing is set **per region** (USD/month). For HA tiers (Starter, Growth, Scale)
 
 | Plan    | EU Central | US East | Asia Pacific (Singapore) |
 |---------|------------|---------|--------------------------|
+| Hobby   | $9         | —       | —                        |
 | Solo    | $29        | $29     | $29                      |
 | Starter | $49/node   | $59/node | —                       |
 | Growth  | $85/node   | $119/node | —                      |
@@ -64,7 +65,7 @@ Pricing is set **per region** (USD/month). For HA tiers (Starter, Growth, Scale)
 
 <Note>Singapore offers the Solo plan only; the HA tiers (Starter/Growth/Scale) are available in EU-Central and US-East.</Note>
 
-<Info>The Free tier is $0 in every region, and Solo is $29 in every region. For the HA tiers, EU Central is the cheapest; US East is priced higher to reflect regional infrastructure costs.</Info>
+<Info>Hobby is $9/month in EU Central only, and Solo is $29 in every region. For the HA tiers, EU Central is the cheapest; US East is priced higher to reflect regional infrastructure costs.</Info>
 
 ## Solo plan
 
@@ -98,9 +99,9 @@ The VM type and price differ by region (see [Per-region pricing](#per-region-pri
 
 > **Note**: Solo does not include high availability, automatic failover, or a load balancer. DNS points directly to the VM's public IP. For production workloads that require HA, use a Starter or higher HA cluster.
 
-## Upgrading from Free
+## Upgrading from Hobby
 
-Already on the Free tier? You can upgrade a free database to **Solo** in one click from the dashboard. We provision your dedicated VM and **migrate your data across automatically** (typically ~3 minutes). Your free database stays online and untouched until you delete it, so you can verify everything first.
+Already on Hobby? You can upgrade a Hobby database to **Solo** in one click from the dashboard. We provision your dedicated VM and **migrate your data across automatically** (typically ~3 minutes). Your Hobby database stays online and untouched until you delete it, so you can verify everything first.
 
 ## HA cluster server types
 
@@ -131,11 +132,11 @@ Examples below use **EU Central** rates (the cheapest region). For US East, subs
 
 ## Regions
 
-| Region | Location | Free | Solo | HA |
-|--------|----------|------|------|----|
+| Region | Location | Hobby | Solo | HA |
+|--------|----------|-------|------|----|
 | EU Central | Falkenstein, Germany | Yes | Yes | Yes |
-| US East | Virginia, USA | Yes | Yes | Yes |
-| Asia Pacific | Singapore | Yes | Yes | No |
+| US East | Virginia, USA | No | Yes | Yes |
+| Asia Pacific | Singapore | No | Yes | No |
 
 Pricing varies by region, and **EU Central is the cheapest**. See [Per-region pricing](#per-region-pricing). Solo hardware specs also vary by region; see the Solo section above. **Singapore offers the Solo plan only; the HA tiers (Starter/Growth/Scale) are available in EU-Central and US-East.**
 
@@ -166,13 +167,16 @@ Every HA cluster includes the following at no additional cost:
 - **HA clusters**: Adding or removing nodes updates your subscription immediately. Changes are prorated. The per-node rate depends on the cluster's region.
 - **Cancellation**: Cancel anytime from the Billing page. Your database remains active until the end of the current billing period.
 
-## Free tier limits
+## Hobby limits
 
 | Limit | Value |
 |-------|-------|
-| Databases per account | 1 |
-| Storage per database | 2 GB |
-| Connections per database | 15 |
-| Backups | Not included |
-| High availability | Not included |
-| Monitoring | Basic metrics only |
+| Databases | One per Hobby subscription |
+| Storage | 5 GB soft quota. Email warning at 80%. At 100%, connections are stopped and existing sessions are closed until usage drops below 90%. |
+| Connections | Up to 20 per database, direct to Postgres on port `5432` with `sslmode=require`. No PgBouncer or pooler. |
+| Region | EU Central (`eu-central`) only |
+| Backups | Daily full backups plus continuous WAL archiving, kept 14 days. Restores are whole-cluster and done by Rivestack support. No self-service per-database restore and no point-in-time recovery for customers. |
+| High availability | No |
+| Read replicas | No |
+| Point-in-time recovery | No |
+| Monitoring | Point-in-time snapshot of database size and percent of quota, active connections, cache hit ratio, transactions, rows, and deadlocks. No historical graphs, TPS or latency series, or alerts. |
