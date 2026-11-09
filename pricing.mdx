@@ -175,7 +175,7 @@ Every HA cluster includes the following at no additional cost:
 | Storage | 5 GB soft quota. Email warning at 80%. At 100%, connections are stopped and existing sessions are closed until usage drops below 90%. |
 | Connections | Up to 20 per database, direct to Postgres on port `5432` with `sslmode=require`. No PgBouncer or pooler. |
 | Region | EU Central (`eu-central`) only |
-| Backups | <!-- TODO(backups): pending CTO --> |
+| Backups | Daily full backups plus continuous WAL archiving, kept 14 days. Restores are whole-cluster and done by Rivestack support. No self-service per-database restore and no point-in-time recovery for customers. |
 | High availability | No |
 | Read replicas | No |
 | Point-in-time recovery | No |

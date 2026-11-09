@@ -5,8 +5,7 @@ description: "Frequently asked questions about Rivestack"
 
 <AccordionGroup>
   <Accordion title="What's the difference between Hobby, Solo, and HA?">
-    - **Hobby ($9/mo)**: shared Postgres for development and testing, available in EU Central (`eu-central`) only. One database per Hobby subscription. Up to 20 connections, direct to Postgres on port `5432` with `sslmode=require`. No PgBouncer or pooler. 5 GB soft quota, with an email warning at 80%. At 100%, connections are stopped and existing sessions are closed until usage drops below 90%. No high availability, read replicas, or point-in-time recovery. A Hobby database is deleted only when its subscription is cancelled or the account is deleted.
-    <!-- TODO(backups): pending CTO -->
+    - **Hobby ($9/mo)**: shared Postgres for development and testing, available in EU Central (`eu-central`) only. One database per Hobby subscription. Up to 20 connections, direct to Postgres on port `5432` with `sslmode=require`. No PgBouncer or pooler. 5 GB soft quota, with an email warning at 80%. At 100%, connections are stopped and existing sessions are closed until usage drops below 90%. No high availability or read replicas. Hobby databases get daily full backups plus continuous WAL archiving, kept 14 days. Restores are whole-cluster and done by Rivestack support. There is no self-service per-database restore and no point-in-time recovery for customers. A Hobby database is deleted only when its subscription is cancelled or the account is deleted.
     - **Solo ($29/mo)**: your own single-tenant VM (1 vCPU · 2 GB RAM · 30 GB NVMe) with daily backups, point-in-time recovery, and monitoring. Single node, so no automatic failover, but never deleted. Ideal for small production apps.
     - **HA Cluster (from $49/node/mo)**: dedicated infrastructure with 1 to 3 nodes. Choose at least 2 nodes for automatic failover; applications must retry connections during a failover.
   </Accordion>
@@ -42,7 +41,7 @@ description: "Frequently asked questions about Rivestack"
   </Accordion>
 
   <Accordion title="How do backups work?">
-    Solo and HA clusters include automated daily backups via pgBackRest, stored in S3-compatible object storage. Retention is 7 days on Solo and 14 days on HA clusters. You can also trigger manual backups and restore to any point in time within the retention window. <!-- TODO(backups): pending CTO --> See the [Backups & Restore](/backups) guide for details.
+    Solo and HA clusters include automated daily backups via pgBackRest, stored in S3-compatible object storage. Retention is 7 days on Solo and 14 days on HA clusters. You can also trigger manual backups and restore to any point in time within the retention window. Hobby databases get daily full backups plus continuous WAL archiving, kept 14 days. Restores are whole-cluster and done by Rivestack support. There is no self-service per-database restore and no point-in-time recovery for customers. See the [Backups & Restore](/backups) guide for details.
   </Accordion>
 
   <Accordion title="Can I restore to a specific point in time?">
