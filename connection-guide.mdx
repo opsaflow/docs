@@ -84,7 +84,7 @@ Find your connection credentials in the Rivestack dashboard under the **Connecti
 
 <Note>
   Port `6432` applies to every dedicated plan — Solo, Starter, Growth and Scale — on a
-  single node and after scaling to HA alike. Free shared databases use `5432`. Copying the
+  single node and after scaling to HA alike. Hobby shared databases use `5432`. Copying the
   connection string from the dashboard always gives you the right one.
 </Note>
 
@@ -321,7 +321,7 @@ Dedicated plans connect through PgBouncer in transaction-pooling mode: the first
 
 | Plan | Client connections | Transaction slots per database |
 |------|--------------------|-------------------------------|
-| Free | 15 (direct) | 15 |
+| Hobby | 20 (direct) | 20 |
 | Solo | 500 | 20 |
 | Starter | 2,000 | 25 |
 | Growth | 5,000 | 30 |
@@ -349,6 +349,6 @@ Dedicated plans connect through PgBouncer in transaction-pooling mode: the first
     to download.
   </Accordion>
   <Accordion title="Too many connections">
-    Free databases allow 15 direct connections. Dedicated plans accept 500 to 10,000 pooled client connections depending on server type, with 20 to 40 transaction slots per database; extra clients queue briefly rather than failing. See the connection limits table above.
+    Hobby databases allow 20 direct connections. Dedicated plans accept 500 to 10,000 pooled client connections depending on server type, with 20 to 40 transaction slots per database; extra clients queue briefly rather than failing. See the connection limits table above.
   </Accordion>
 </AccordionGroup>

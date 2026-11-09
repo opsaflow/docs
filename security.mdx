@@ -34,7 +34,7 @@ Contact [hi@rivestack.io](mailto:hi@rivestack.io) before placing data that requi
 
 ### Shared cloud firewall
 
-Database VMs are covered by one reconciled Hetzner Cloud Firewall selected by server labels. This avoids Hetzner's per-project firewall limit. It exposes only the two documented database service ports and restricts SSH to Rivestack operations CIDRs; all other unsolicited public inbound traffic is dropped by the cloud firewall. Dedicated hosts also drop raw public PostgreSQL traffic on `5432`, leaving that port for the free shared service and private cluster traffic.
+Database VMs are covered by one reconciled Hetzner Cloud Firewall selected by server labels. This avoids Hetzner's per-project firewall limit. It exposes only the two documented database service ports and restricts SSH to Rivestack operations CIDRs; all other unsolicited public inbound traffic is dropped by the cloud firewall. Dedicated hosts also drop raw public PostgreSQL traffic on `5432`, leaving that port for the Hobby shared service and private cluster traffic.
 
 Tenant allowlists are enforced on each database host, so adding customers does not create additional Hetzner firewalls:
 
@@ -62,7 +62,7 @@ Cluster nodes use tenant-private networks for database traffic and a regional pr
 
 | Port | Service | Access |
 |------|---------|--------|
-| 5432 | Free shared PostgreSQL | Public shared endpoint; TLS and database credentials required |
+| 5432 | Hobby shared PostgreSQL | Public shared endpoint; TLS and database credentials required |
 | 6432 | PostgreSQL through PgBouncer | Public endpoint, restricted by the cluster IP allowlist |
 
 The dashboard hostname points directly to the VM for a single-node dedicated cluster and to one Hetzner Load Balancer after the cluster is scaled to HA.

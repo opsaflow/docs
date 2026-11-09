@@ -4,14 +4,14 @@ description: "Frequently asked questions about Rivestack"
 ---
 
 <AccordionGroup>
-  <Accordion title="What's the difference between Free, Solo, and HA?">
-    - **Free ($0)**: a shared PostgreSQL database for development and testing. 2 GB storage, 15 connections, no backups, deleted after 30 days of inactivity.
+  <Accordion title="What's the difference between Hobby, Solo, and HA?">
+    - **Hobby ($9/mo)**: shared Postgres for development and testing. 5 GB storage, 20 connections, available in EU Central (`eu-central`) only. No backups, and deleted after 30 days of inactivity.
     - **Solo ($29/mo)**: your own single-tenant VM (1 vCPU · 2 GB RAM · 30 GB NVMe) with daily backups, point-in-time recovery, and monitoring. Single node, so no automatic failover, but never deleted. Ideal for small production apps.
     - **HA Cluster (from $49/node/mo)**: dedicated infrastructure with 1 to 3 nodes. Choose at least 2 nodes for automatic failover; applications must retry connections during a failover.
   </Accordion>
 
-  <Accordion title="How do I upgrade from Free to Solo?">
-    Open the free database in your dashboard and click **Upgrade**. We provision your dedicated Solo VM and **migrate your data across automatically** (typically ~3 minutes). Your free database stays online and untouched until you delete it, so you can verify everything first, then just point your app at the new host and credentials.
+  <Accordion title="How do I upgrade from Hobby to Solo?">
+    Open the Hobby database in your dashboard and click **Upgrade**. We provision your dedicated Solo VM and **migrate your data across automatically** (typically ~3 minutes). Your Hobby database stays online and untouched until you delete it, so you can verify everything first, then just point your app at the new host and credentials.
   </Accordion>
 
   <Accordion title="What PostgreSQL version does Rivestack use?">
@@ -41,7 +41,7 @@ description: "Frequently asked questions about Rivestack"
   </Accordion>
 
   <Accordion title="How do backups work?">
-    Solo and HA clusters include automated daily backups via pgBackRest, stored in S3-compatible object storage. Retention is 7 days on Solo and 14 days on HA clusters. You can also trigger manual backups and restore to any point in time within the retention window. Free tier databases are not backed up. See the [Backups & Restore](/backups) guide for details.
+    Solo and HA clusters include automated daily backups via pgBackRest, stored in S3-compatible object storage. Retention is 7 days on Solo and 14 days on HA clusters. You can also trigger manual backups and restore to any point in time within the retention window. Hobby databases are not backed up. See the [Backups & Restore](/backups) guide for details.
   </Accordion>
 
   <Accordion title="Can I restore to a specific point in time?">
@@ -53,7 +53,7 @@ description: "Frequently asked questions about Rivestack"
     - **US East**: Virginia, USA
     - **Asia Pacific**: Singapore (Solo plan only)
 
-    Free and Solo are available in all regions. The HA tiers (Starter/Growth/Scale) are available in EU Central and US East only, so Singapore offers the Solo plan only. Pricing is set per region, and **EU Central is the cheapest**. See [Pricing](/pricing#per-region-pricing).
+    Hobby is available in EU Central (`eu-central`) only. Solo is available in all regions. The HA tiers (Starter/Growth/Scale) are available in EU Central and US East only, so Singapore offers the Solo plan only. Pricing is set per region, and **EU Central is the cheapest**. See [Pricing](/pricing#per-region-pricing).
   </Accordion>
 
   <Accordion title="Can I scale my cluster?">
@@ -63,7 +63,7 @@ description: "Frequently asked questions about Rivestack"
   </Accordion>
 
   <Accordion title="What are the connection limits?">
-    - **Free**: 15 direct PostgreSQL connections per database
+    - **Hobby**: 20 direct PostgreSQL connections per database
     - **Solo**: 500 pooled client connections, 20 transaction slots per database
     - **Starter**: 2,000 pooled client connections, 25 transaction slots
     - **Growth**: 5,000 pooled client connections, 30 transaction slots
@@ -89,7 +89,7 @@ description: "Frequently asked questions about Rivestack"
   </Accordion>
 
   <Accordion title="Is there a free trial for HA clusters?">
-    There is no free trial for HA clusters, but the **Free tier** lets you explore Rivestack at no cost with a shared PostgreSQL database (2 GB storage, 15 connections).
+    There is no free trial for HA clusters. Hobby is shared Postgres at $9/month, with 5 GB storage and 20 connections, available in EU Central (`eu-central`) only.
   </Accordion>
 
   <Accordion title="How do I monitor my database?">
