@@ -1,0 +1,80 @@
+---
+title: "MCP quickstart"
+description: "Connect Claude Code, Cursor and Claude Desktop to Rivestack PostgreSQL with the hosted MCP server. Read-only by default."
+icon: "plug"
+---
+
+Rivestack runs a hosted [Model Context Protocol](https://modelcontextprotocol.io) server at `https://mcp.rivestack.io/mcp`. It gives your coding agent access to your Rivestack databases: list them, inspect schemas, run SQL, and work with pgvector.
+
+<Note>
+The server is **read-only by default**. SQL runs inside a PostgreSQL `READ ONLY` transaction, and tools that write or cost money are hidden until you add `read_only=false` to the URL.
+</Note>
+
+## Claude Code
+
+```bash
+claude mcp add --transport http rivestack https://mcp.rivestack.io/mcp
+```
+
+Run `/mcp` in Claude Code, pick `rivestack`, and choose **Authenticate**. Your browser opens to sign in to your Rivestack account.
+
+To use an API key instead of signing in:
+
+```bash
+claude mcp add --transport http rivestack https://mcp.rivestack.io/mcp \
+  --header "Authorization: Bearer $RIVESTACK_API_KEY"
+```
+
+## Cursor
+
+Add this to `.cursor/mcp.json` in your project, or to `~/.cursor/mcp.json` for every project:
+
+```json
+{
+  "mcpServers": {
+    "rivestack": {
+      "url": "https://mcp.rivestack.io/mcp"
+    }
+  }
+}
+```
+
+Open **Cursor Settings → MCP**. Cursor asks you to sign in to Rivestack, then lists the tools. For an API key, add `"headers": { "Authorization": "Bearer ${env:RIVESTACK_API_KEY}" }` next to `url`.
+
+## Claude Desktop
+
+Open **Settings → Connectors → Add custom connector**, enter `https://mcp.rivestack.io/mcp`, and sign in to Rivestack when prompted.
+
+## Choose what the agent can do
+
+Add query parameters to the URL. They apply to the whole session.
+
+| Parameter | Default | Effect |
+|---|---|---|
+| `read_only` | `true` | `false` shows the write tools: `create_database`, `apply_migration`, `create_vector_table`, `create_index`, `restore_from_backup`. |
+| `database` | all your databases | Limit the session to one database, for example `ha:123`. Get the ID from `list_databases`. |
+| `features` | `account,sql,schema,vector,ops,docs` | Tool groups to expose. |
+
+For writes, add a second server, for example `rivestack-write` with `https://mcp.rivestack.io/mcp?read_only=false&database=ha:123`, and use it only when you need it. `create_database` and `restore_from_backup` always show a preview first and act only when the agent confirms.
+
+## Tools
+
+| Group | Tools |
+|---|---|
+| account | `list_databases`, `get_database`, `get_connection_string`, `create_database` (write) |
+| sql | `execute_sql`, `explain` |
+| schema | `list_tables`, `describe_table`, `apply_migration` (write) |
+| vector | `similarity_search`, `index_stats`, `create_vector_table` (write), `create_index` (write) |
+| ops | `list_backups`, `get_metrics`, `get_logs`, `restore_from_backup` (write) |
+| docs | `search_docs` |
+
+## Try it
+
+- "List my Rivestack databases."
+- "Describe the tables in my database."
+- "Find the 5 rows in `documents` most similar to 'how do I connect?'."
+
+## Safety
+
+- API keys (`rsk_...`) are account-wide. Read-only is set by the URL, not the key. Create a separate key for agents so you can revoke it on its own.
+- Keep your client's tool approvals on, and point agents at a non-production database first.

@@ -23,7 +23,8 @@
             "pages": [
               "index",
               "getting-started",
-              "connection-guide"
+              "connection-guide",
+              "mcp-quickstart"
             ]
           },
           {
