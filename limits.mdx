@@ -8,18 +8,25 @@ description: "Connection limits, storage, and resource quotas"
 | Resource | Hobby | Solo | HA Cluster |
 |----------|-------|------|------------|
 | **Price** | $9/mo | $29/mo | From $49/node/mo |
-| **Databases** | 1 | Multiple (storage permitting) | Unlimited |
-| **Connections** | 20 per database (direct) | 500 pooled clients | 2,000–10,000 pooled clients (by server type) |
-| **Storage** | 5 GB per database | 30 GB | Depends on server type |
+| **Databases** | One per subscription | Multiple (storage permitting) | Unlimited |
+| **Connections** | Up to 20, direct on port `5432` (`sslmode=require`) | 500 pooled clients | 2,000–10,000 pooled clients (by server type) |
+| **Storage** | 5 GB soft quota | 30 GB | Depends on server type |
 | **Region** | EU Central only | All regions | EU Central and US East |
 | **Nodes** | Shared | 1 dedicated | 1–3 dedicated |
 | **Automatic failover** | No | No (single node) | With 2 or more healthy nodes |
-| **Backups** | Not included | Daily, 7-day retention | Daily, 14-day retention |
-| **Point-in-time recovery** | Not included | Included | Included |
-| **Monitoring** | Basic | Full metrics | Full metrics |
+| **Read replicas** | No | No | No read-serving replicas |
+| **Backups** | <!-- TODO(backups): pending CTO --> | Daily, 7-day retention | Daily, 14-day retention |
+| **Point-in-time recovery** | No | Included | Included |
+| **Monitoring** | Point-in-time snapshot only | Full metrics | Full metrics |
 | **SQL Editor** | Included | Included | Included |
 | **Default extensions** | pgvector and pgvectorscale | 6, including pgvector and pgvectorscale | 6, including pgvector and pgvectorscale |
-| **Inactivity deletion** | After 30 days | Never | Never |
+| **Inactivity deletion** | No | Never | Never |
+
+A Hobby database is deleted only when its subscription is cancelled or the account is deleted.
+
+Hobby storage is a 5 GB soft quota. You receive an email warning at 80%. At 100%, connections are stopped and existing sessions are closed until usage drops below 90%.
+
+Hobby monitoring is a point-in-time snapshot of database size and percent of quota, active connections, cache hit ratio, transactions, rows, and deadlocks. Hobby has no historical graphs, TPS or latency series, or alerts.
 
 ## Storage per server type
 
@@ -33,11 +40,12 @@ description: "Connection limits, storage, and resource quotas"
 
 ## Connection limits
 
-Hobby databases connect directly to PostgreSQL. Dedicated plans connect through PgBouncer in transaction-pooling mode on port `6432`, which separates two numbers that are easy to conflate: how many **client connections** your applications can hold open, and how many **transaction slots** actually execute on PostgreSQL at once. Clients beyond the slot count are not rejected; they wait briefly for a free slot.
+Hobby connects directly to Postgres on port `5432` with `sslmode=require`. There is no PgBouncer or pooler. Each Hobby database accepts up to 20 connections.
+
+Dedicated plans connect through PgBouncer in transaction-pooling mode on port `6432`, which separates two numbers that are easy to conflate: how many **client connections** your applications can hold open, and how many **transaction slots** actually execute on PostgreSQL at once. Clients beyond the slot count are not rejected; they wait briefly for a free slot.
 
 | Plan | Client connections | Transaction slots per database |
 |------|--------------------|-------------------------------|
-| **Hobby** | 20 (direct) | 20 |
 | **Solo** | 500 | 20 |
 | **Starter** | 2,000 | 25 |
 | **Growth** | 5,000 | 30 |
@@ -117,5 +125,6 @@ To keep many application workers inside your plan’s client-connection budget, 
 
 ## Exceeding limits
 
-- **Storage full**: Write operations will fail. Scale to a larger server type or delete unused data.
-- **Connection limit reached**: New connections are rejected. Close idle connections or implement connection pooling.
+- **Dedicated storage full**: Write operations will fail. Scale to a larger server type or delete unused data.
+- **Hobby storage**: At 80% of the 5 GB soft quota, you receive an email warning. At 100%, connections are stopped and existing sessions are closed until usage drops below 90%.
+- **Connection limit reached**: New connections are rejected. On a dedicated plan, close idle connections or use a client-side pool. Hobby accepts up to 20 direct connections and does not use a pooler.

@@ -83,8 +83,8 @@ Find your connection credentials in the Rivestack dashboard under the **Connecti
 | SSL Mode | Certificate and hostname verification | `verify-full` |
 
 <Note>
-  Port `6432` applies to every dedicated plan — Solo, Starter, Growth and Scale — on a
-  single node and after scaling to HA alike. Hobby shared databases use `5432`. Copying the
+  Port `6432` and `sslmode=verify-full` apply to every dedicated plan — Solo, Starter, Growth and Scale — on a
+  single node and after scaling to HA alike. Hobby connects directly to Postgres on port `5432` with `sslmode=require`. There is no PgBouncer or pooler, and each Hobby database accepts up to 20 connections. Copying the
   connection string from the dashboard always gives you the right one.
 </Note>
 
@@ -104,7 +104,7 @@ postgresql://username:password@host:6432/dbname?sslmode=verify-full&sslrootcert=
 
 ## SSL / TLS
 
-All Rivestack connections **require SSL**. Unencrypted connections are rejected. Use `sslmode=verify-full` so the client also verifies the CA chain and confirms that the certificate matches the database hostname. `sslmode=require` encrypts traffic but does not authenticate the server identity.
+All Rivestack connections **require SSL**. Unencrypted connections are rejected. Dedicated plans use `sslmode=verify-full` so the client also verifies the CA chain and confirms that the certificate matches the database hostname. Hobby connects directly to Postgres on port `5432` with `sslmode=require`.
 
 There is no CA certificate to download. Rivestack certificates are issued by Let's Encrypt, which every operating system already trusts.
 
@@ -317,11 +317,12 @@ All connections use port `6432` — the same port a single-node cluster uses. Sc
 
 ## Connection limits
 
+Hobby connects directly to Postgres on port `5432` with `sslmode=require`. There is no PgBouncer or pooler. Each Hobby database accepts up to 20 connections.
+
 Dedicated plans connect through PgBouncer in transaction-pooling mode: the first number is how many client connections the pooled endpoint accepts, the second how many transactions execute on PostgreSQL at once per database. Clients beyond the slot count wait briefly instead of failing.
 
 | Plan | Client connections | Transaction slots per database |
 |------|--------------------|-------------------------------|
-| Hobby | 20 (direct) | 20 |
 | Solo | 500 | 20 |
 | Starter | 2,000 | 25 |
 | Growth | 5,000 | 30 |
@@ -349,6 +350,6 @@ Dedicated plans connect through PgBouncer in transaction-pooling mode: the first
     to download.
   </Accordion>
   <Accordion title="Too many connections">
-    Hobby databases allow 20 direct connections. Dedicated plans accept 500 to 10,000 pooled client connections depending on server type, with 20 to 40 transaction slots per database; extra clients queue briefly rather than failing. See the connection limits table above.
+    Hobby databases accept up to 20 direct connections to Postgres on port `5432` with `sslmode=require`. They do not use PgBouncer or a pooler. Dedicated plans accept 500 to 10,000 pooled client connections depending on server type, with 20 to 40 transaction slots per database; extra clients queue briefly rather than failing. See the connection limits table above.
   </Accordion>
 </AccordionGroup>

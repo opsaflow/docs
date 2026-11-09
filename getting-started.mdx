@@ -19,7 +19,7 @@ Rivestack is a managed PostgreSQL service that gives you production-ready databa
   </Card>
 </CardGroup>
 
-<Tip>Hobby is shared Postgres at $9/month, with 5 GB storage and 20 connections, available in EU Central (`eu-central`) only. You can [upgrade a Hobby database to Solo](/pricing#upgrading-from-hobby) in one click, and we migrate your data across automatically.</Tip>
+<Tip>Hobby is shared Postgres at $9/month in EU Central (`eu-central`) only: one database per subscription, up to 20 direct connections to Postgres on port `5432` with `sslmode=require`, and a 5 GB soft quota. At 80% you receive an email warning. At 100%, connections are stopped and existing sessions are closed until usage drops below 90%. You can [upgrade a Hobby database to Solo](/pricing#upgrading-from-hobby) in one click, and we migrate your data across automatically.</Tip>
 
 ## Create your first cluster
 
@@ -31,7 +31,7 @@ Create your Rivestack account at [app.rivestack.io](https://app.rivestack.io). Y
 
 <Tabs>
   <Tab title="Solo trial">
-    New databases on this tab are Solo. Hobby is shared Postgres at $9/month, with 5 GB storage and 20 connections, in EU Central (`eu-central`) only.
+    New databases on this tab are Solo. Hobby is shared Postgres at $9/month in EU Central (`eu-central`) only: one database per subscription, up to 20 direct connections to Postgres on port `5432` with `sslmode=require`, and a 5 GB soft quota.
 
     1. From the dashboard, click **Create Database**.
     2. Enter a **name**.
@@ -42,7 +42,7 @@ Create your Rivestack account at [app.rivestack.io](https://app.rivestack.io). Y
     If you already have a Hobby database, upgrade it to Solo from the dashboard. The data is copied across and the Hobby database stays online until you delete it.
   </Tab>
   <Tab title="Solo">
-    1. From the dashboard, click **Create Database** (or **Upgrade** on an existing Hobby database). Hobby is shared Postgres at $9/month, with 5 GB storage and 20 connections, in EU Central (`eu-central`) only.
+    1. From the dashboard, click **Create Database** (or **Upgrade** on an existing Hobby database). Hobby is shared Postgres at $9/month in EU Central (`eu-central`) only: one database per subscription, up to 20 direct connections to Postgres on port `5432` with `sslmode=require`, and a 5 GB soft quota.
     2. Enter a **name**.
     3. Select **Solo** as the plan.
     4. Choose your **region** (EU, US, or Singapore). Solo is $29/month in every region. HA tiers cost more in US East than in EU Central. See [Pricing](/pricing#per-region-pricing).

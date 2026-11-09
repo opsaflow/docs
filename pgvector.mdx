@@ -131,7 +131,7 @@ ALTER DATABASE appdb SET hnsw.ef_search = 100;
 <Warning>
   **A plain session `SET hnsw.ef_search` is silently ignored.** Every dedicated plan (Solo, Starter, Growth, Scale) connects through PgBouncer in **transaction-pooling** mode on port `6432`, so a bare `SET hnsw.ef_search = 100;` runs in its own transaction and is reset before your next query, leaving you with the default (`40`) instead. Always either use `SET LOCAL` *inside the same transaction* as the query, or set a persistent default with `ALTER DATABASE appdb SET hnsw.ef_search = …` (or `ALTER ROLE appdb SET …`).
 
-  Hobby databases connect directly to PostgreSQL on port `5432`, where a plain session `SET` works normally. This holds on HA clusters too. The load balancer and source-filtering HAProxy gateway pass the TLS stream to PgBouncer rather than to PostgreSQL directly, so scaling up does not turn session-level `SET` back on.
+  Hobby databases connect directly to Postgres on port `5432` with `sslmode=require`. There is no PgBouncer or pooler, so a plain session `SET` works normally. The limitation still holds on HA clusters. The load balancer and source-filtering HAProxy gateway pass the TLS stream to PgBouncer rather than to PostgreSQL directly, so scaling up does not turn session-level `SET` back on.
 </Warning>
 
 ### IVFFlat index
@@ -225,6 +225,6 @@ Scale also builds and serves a 1M × 1536 index (~6 GB) hot: ~3,600 QPS at recal
 - **Always create an index** for tables over a few thousand rows. Without an index, pgvector scans every row.
 - **Use HNSW** as your default index type. It offers the best recall/speed trade-off.
 - **Benchmark StreamingDiskANN** when the vector graph is too large to keep comfortably in memory.
-- **Increase `ef_search`** if recall is too low. Start with 100 and increase as needed, but set it with `SET LOCAL` inside the query's transaction or via `ALTER DATABASE … SET` — every plan pools on `:6432`, and a plain session `SET` is dropped by transaction pooling. The same applies to `ivfflat.probes`.
+- **Increase `ef_search`** if recall is too low. Start with 100 and increase as needed. Dedicated plans pool on `:6432`, and a plain session `SET` is dropped by transaction pooling, so set `hnsw.ef_search` and `ivfflat.probes` with `SET LOCAL` inside the query's transaction or via `ALTER DATABASE … SET`. Hobby connects directly on port `5432`, so a plain session `SET` works there.
 - **Batch inserts** for loading large datasets. Use `COPY` or multi-row `INSERT` for best throughput.
 - **Choose the right distance operator** for your use case. Cosine (`<=>`) is the most common for text embeddings.
